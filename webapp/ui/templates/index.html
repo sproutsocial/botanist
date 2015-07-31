@@ -1,0 +1,23 @@
+{% load staticfiles %}
+<link rel="stylesheet" type="text/css" href="{% static 'ui.css' %}"/>
+<div id="spacer" style="padding-top: 25px;"></div>
+<div id="search-main">
+    botanist code search<br><br>
+
+    <form action="/search/" method="get">
+        <input id="search-box" type="text" name="q" size="70px" autofocus>
+        <br>
+        <br>
+        <input type="hidden" name="case" value="sensitive">
+
+        <div id="search-box-display" class="regex"></div>
+        <label for="case-insensitive-input">ignore case</label>
+        <input id="case-insensitive-input" name="case" type="checkbox"
+               value="insensitive">
+        <input type="submit" value="submit">
+    </form>
+</div>
+<div id="search-help">
+    note: searches are <a href="https://github.com/google/re2/wiki/Syntax">RE2
+    (nearly PCRE) regular expressions</a>
+</div>

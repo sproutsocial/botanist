@@ -1,0 +1,69 @@
+#!/usr/bin/env bash
+
+USER="%RUNASUSER%"
+INSTALL_DIR=/home/$USER/botanist
+BIN=$INSTALL_DIR/bin
+REPOS=$INSTALL_DIR/repos
+LOG_DIR=$INSTALL_DIR/logs
+
+############################
+# bitbucket.org
+############################
+BITBUCKET=$REPOS/bitbucket
+IGNORE_REPO_LIST=""
+BITBUCKET_TEAM="%BB_TEAM%"
+# bitbucket creds
+# NOTE: you'll need to have ssh keys setup in order to update repos...
+# *OR* use http for everything (see $USE_HTTP)
+BB_USERNAME="%BB_USERNAME%"
+BB_PASSWORD="%BB_PASSWORD%"
+USE_BB="%USE_BB%"
+USE_HTTP="--http"
+
+############################
+# github.com
+############################
+GITHUB=$REPOS/github
+GITHUB_ORG="%GH_ORG%"
+USE_GH="%USE_GH%"
+GH_USERNAME="%GH_USERNAME%"
+GH_PASSWORD="%GH_PASSWORD%"
+
+lockfile=/var/tmp/fetch-code.lock
+
+function log {
+  echo -e "`date +"%Y-%m-%d %T %Z"` $1"
+}
+
+if ( set -o noclobber; echo "$$" > "$lockfile") 2> /dev/null; then
+
+    trap 'rm -f "$lockfile"; exit $?' INT TERM EXIT
+    chmod 600 $lockfile
+
+    if [[ $USE_BB == "true" ]]; then
+
+        log "Starting fetching/updating bitbucket.org repositories..."
+        mkdir -p $LOG_DIR
+        $BIN/bitbucket-backup/backup.py $USE_HTTP -u $BB_USERNAME -l $BITBUCKET -p $BB_PASSWORD -t $BITBUCKET_TEAM -v --ignore-repo-list $IGNORE_REPO_LIST 2>&1
+
+    fi
+
+    if [[ $USE_GH == "true" ]]; then
+
+        log "Starting fetching/updating github.com repositories..."
+        mkdir -p $LOG_DIR
+        $BIN/github_backup.py https -u $GH_USERNAME -p $GH_PASSWORD -o $GITHUB_ORG -d $GITHUB 2>&1
+
+    fi
+
+    log "Finished."
+
+    # clean up after yourself, and release your trap
+    rm -f "$lockfile"
+    trap - INT TERM EXIT
+
+else
+    log "Lock Exists: $lockfile owned by $(cat $lockfile)"
+fi
+
+

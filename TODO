@@ -1,0 +1,21 @@
+EASY
+* deep linking to JIRA issue tags BUGS-1001 that appear in source, etc.
+- use django caching (in memory?) to cache results for a few minutes
+- add "last indexed" somehow so search reports when the code was last...indexed :)
+- allow filtering out code search results that are import statements, usually they can be noisy when searching for something thats actually being used?
+
+MEDIUM
+* use is_fork = True thing in bitbucket's api. add a filter that would eliminate forks
+- add filter to not return search results from comments in code
+- prune deleted/renamed repositories (will have to be handled on the cron side)
+- add repo multi-select to search page so you can scope search to a subset of all repos
+
+HARD
+- some lines of context (before/after)
+- commit message searching (maybe less than hard? hmm)
+
+MAYBE SOMEDAY
+- add option to make the search non-regex based? (not sure if possible with google codesearch tool...)
+- reindex based on bitbucket commit hook??? (not super worth it, reindexing is taking about 2 minutes on hundreds of repositories)
+
+* are desireable ones

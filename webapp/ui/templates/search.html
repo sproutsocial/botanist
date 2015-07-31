@@ -1,0 +1,63 @@
+{% load staticfiles %}
+<link rel="stylesheet" type="text/css" href="{% static 'ui.css' %}"/>
+{#<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/styles/default.min.css">#}
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/styles/mono-blue.min.css">
+{#<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/styles/ascetic.min.css">#}
+{#<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/styles/solarized_dark.min.css">#}
+<script>
+</script>
+
+<div class="container">
+<div class="header">
+    <div id="search-form-container">
+        <form action="/search/" method="get">
+            <!-- onfocus makes sure the input text box has the cursor at the end of the line -->
+            <input id="search-box" type="text" name="q" size="70px" value="{{ query }}" onfocus="this.value = this.value;" autofocus>
+            <input type="hidden" name="case" value="sensitive">
+            <label for="case-insensitive-input">-i</label>
+            <input id="case-insensitive-input" name="case" type="checkbox" value="insensitive">
+            <input type="submit" value="submit">
+        </form>
+    </div>
+    {% if error %}
+        <div class="error">error: {{ error }}</div>
+    {% else %}
+    <div id="search-results-summary">
+        {{ result_count }} results found in {{ results|length }} repos ({{ time }})
+    </div>
+    </div>
+    <div class="content">
+        <div class="wrapper">
+            <div class="left-nav">
+                {% for reponame, repo_result_data in results.items %}
+                    {% if repo_result_data.vcs_loc == "bitbucket" %}
+                        <img src="{%  static 'bitbucket.favicon.ico' %}" class="vcs_loc" />
+                    {% elif repo_result_data.vcs_loc == "github" %}
+                        <img src="{% static 'github.favicon.ico' %}" class="vcs_loc" />
+                    {% endif %}
+                    <a href="#{{ reponame }}" class="reponame-nav">{{ reponame }}</a><br>
+                {% endfor %}
+            </div>
+            <div class="search-results">
+                {% for reponame, repo_result_data in results.items %}
+                    <div id="{{ reponame }}">
+                        <div class="reponame">{{ reponame }}</div>
+                        {% for filename, matches in repo_result_data.files.items %}
+                            <div id="{{ filename }}" class="filename">
+                                <span class="filename-text">{{ filename }}</span>
+                                {% for r in matches %}
+                                    <pre><code><a href="{{ r.deeplink }}" target="_blank" title="{{ r.lineno }}" class="source-code-link">{{ r.lineno }}: {{ r.srcline|safe }}</a></code></pre>
+                                {% endfor %}
+                                <br>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    <div class="header">
+        (╯°□°)╯︵ ┻━┻
+    </div>
+</div>
+{% endif %}

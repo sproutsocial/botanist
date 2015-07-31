@@ -1,0 +1,83 @@
+import os
+from django.test import TestCase
+from codesearch.settings import CODE_ROOT
+from codesearch.settings import ORG_NAME
+from ui.views import deep_link
+from ui.views import get_query_re
+from ui.views import get_repo_and_filepath
+from ui.views import prepare_source_line
+
+
+class PrepareSearchLine(TestCase):
+    def test_html_in_source_line_is_escaped_but_span_for_highlight_is_not(self):
+        query = r'TODO'
+        source_line = r'    <!-- TODO: need to clean up these colors below-->'
+        expected = r'    &lt;!-- <span class="highlighted-search-query">TODO</span>: need to clean up these colors below--&gt;'
+
+        query_re = get_query_re(query)
+        result = prepare_source_line(query_re, source_line)
+        self.assertEquals(expected, result)
+
+    def test_regex_query_match_is_highlighted_but_as_original_matched_text(self):
+        query = r'v1\/'
+        source_line = r'			URLLocation="https://example.com/v1/"'
+        expected = u'\t\t\tURLLocation=&quot;https://example.com/<span class="highlighted-search-query">v1/</span>&quot;'
+
+        query_re = get_query_re(query)
+        result = prepare_source_line(query_re, source_line)
+        self.assertEquals(expected, result)
+
+    def test_regex_query_match_is_highlighted_case_insensitive(self):
+        query = r'todo'
+        test_cases = (
+            (r'    #TODO change this', u'    #<span class="highlighted-search-query">TODO</span> change this'),
+            (r'        // todo do something cool', u'        // <span class="highlighted-search-query">todo</span> do something cool')
+        )
+
+        query_re = get_query_re(query, case_sensitive=False)
+        for source_line, expected in test_cases:
+            result = prepare_source_line(query_re, source_line)
+            self.assertEquals(expected, result)
+
+    def test_prep_search_line_with_html_disabled(self):
+        query = r'todo'
+        test_cases = (
+            (r'    #TODO change this', u'    #TODO change this'),
+            (r'        // todo do something cool', u'        // todo do something cool')
+        )
+
+        query_re = get_query_re(query, case_sensitive=False)
+        for source_line, expected in test_cases:
+            result = prepare_source_line(query_re, source_line, html=False)
+            self.assertEquals(expected, result)
+
+
+class SearchResultsParser(TestCase):
+
+    def test_deep_link_bitbucket(self):
+        filename = os.path.join(CODE_ROOT, 'bitbucket', 'repositoryname', 'somedir', 'sourcefile.py')
+        vcs_loc, reponame, filename = get_repo_and_filepath(filename)
+        dl = deep_link(vcs_loc, reponame, filename)
+
+        self.assertEqual('https://bitbucket.org/%s/repositoryname/src/tip/somedir/sourcefile.py' % ORG_NAME, dl)
+
+    def test_deep_link_bitbucket_with_lineno(self):
+        filename = os.path.join(CODE_ROOT, 'bitbucket', 'repositoryname', 'somedir', 'sourcefile.py')
+        vcs_loc, reponame, filename = get_repo_and_filepath(filename)
+        dl = deep_link(vcs_loc, reponame, filename, lineno=42)
+
+        self.assertEqual('https://bitbucket.org/%s/repositoryname/src/tip/somedir/sourcefile.py#cl-42' % ORG_NAME, dl)
+
+    def test_deep_link_github(self):
+        filename = os.path.join(CODE_ROOT, 'github', 'repositoryname', 'somedir', 'sourcefile.py')
+        vcs_loc, reponame, filename = get_repo_and_filepath(filename)
+        dl = deep_link(vcs_loc, reponame, filename)
+
+        self.assertEqual('https://github.com/%s/repositoryname/blob/master/somedir/sourcefile.py' % ORG_NAME, dl)
+
+    def test_deep_link_github_with_lineno(self):
+        filename = os.path.join(CODE_ROOT, 'github', 'repositoryname', 'somedir', 'sourcefile.py')
+        vcs_loc, reponame, filename = get_repo_and_filepath(filename)
+        dl = deep_link(vcs_loc, reponame, filename, lineno=42)
+
+        self.assertEqual('https://github.com/%s/repositoryname/blob/master/somedir/sourcefile.py#L42' % ORG_NAME, dl)
