@@ -41,7 +41,7 @@ The installation script sets up 2 periodic crons that run every half hour:
 * the other (re)indexes the source code using `cindex`
 
 During the installation process, it will ask you what user to run things
-as, as well as for a valid bitbucket username/password. It stores this
+as, as well as bitbucket and/or github credentials. It stores these
 in a file that is only readable by the user it is installed under.
 
 #packages
