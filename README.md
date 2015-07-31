@@ -19,7 +19,6 @@ a web and command-line code search tool for teams.
 #build / installation
 
 ```
-make clean
 make
 ```
 This builds a tarball named `botanist.tar.gz`
