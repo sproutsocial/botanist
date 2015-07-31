@@ -1,18 +1,22 @@
 #botanist
 a web and command-line code search tool for teams.
 
+## web search
 ![botanist-search-main](docs/botanist-search-main.png)
 
 ![botanist-search-results](docs/botanist-search-results.png)
 
-##requirements
+## command line search
+![botanist-btgrep-command-line](docs/botanist-btgrep-command-line.png)
+
+#requirements
 
 * an ubuntu server
 * a username/password for a bitbucket.org account that has access to the repositories desired to be indexed
 * a username/password or username/access_token for a github.com account that has access to repositories desired to be indexed
 * apache, nginx, or any other WSGI server for the Django webapp.
 
-##build / installation
+#build / installation
 
 ```
 make clean
@@ -30,13 +34,13 @@ During the installation process, it will ask you what user to run things
 as, as well as for a valid bitbucket username/password. It stores this
 in a file that is only readable by the user it is installed under.
 
-##packages
+#packages
 
-###code search
+##code search
 https://code.google.com/p/codesearch/
 (cindex running on a periodic cron to re-index)
 
-###repository fetching
+##repository fetching
 https://github.com/samkuehn/bitbucket-backup
 (running on a periodic cron to update the source code to search)
 NOTE: Enclosed under ./packages is a custom fork of
@@ -45,27 +49,3 @@ so he is really quick and amenable to updates, I just haven't quite
 finished cleaning up the additions I made recently.
 
 ##pull requests welcome! checkout the TODOs file
-
-## usages
-### web
-self explanatory, you can search code via the web ui
-### spgrep.py command line utility
-Provides a grep-like interface to the JSON api of the web service, e.g.
-
-```
-$ ./spgrep.py -h
-usage: spgrep.py [-h] [-i] PATTERN
-
-positional arguments:
-  PATTERN            regex pattern you wish to search for
-
-optional arguments:
-  -h, --help         show this help message and exit
-  -i, --ignore-case  Ignore case distinctions
-```
-
-```
-$ ./spgrep.py "class HeartbeaterImpl"
-heartbeater:src/main/java/heartbeater/HeartbeaterImpl.java:24:public class HeartbeaterImpl implements Heartbeater{
-heartbeater:src/test/java/heartbeater/HeartbeaterImplTest.java:34:public class HeartbeaterImplTest {
-```
