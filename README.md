@@ -18,16 +18,28 @@ a web and command-line code search tool for teams.
 
 #build / installation
 
+build and upload to target server:
+
 ```
 make
+scp botanist.tar.gz dest-server:
 ```
-This builds a tarball named `botanist.tar.gz`
 
 untar it on the target server, cd into the directory, and run `install.sh`
 
-You'll have to setup the webapp and start it using any webserver that supports WSGI.
+```
+tar zxvf botanist.tar.gz
+cd botanist
+./install.sh
 
-The installation script sets up 2 periodic crons that run every half hour, one fetches new repositories for the team, the other re-indexes the source code.
+```
+
+You'll have to setup the webapp and start it using your favorite webserver that supports WSGI (Apache, Nginx, Gunicorn, etc.)
+
+The installation script sets up 2 periodic crons that run every half hour:
+
+* one fetches new repositories or pulls the latest commits from bitbucket and/or github
+* the other (re)indexes the source code using `cindex`
 
 During the installation process, it will ask you what user to run things
 as, as well as for a valid bitbucket username/password. It stores this
