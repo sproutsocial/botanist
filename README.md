@@ -1,5 +1,9 @@
 #botanist
-a web-based code search tool
+a web and command-line code search tool for teams.
+
+![botanist-search-main](docs/botanist-search-main.png)
+
+![botanist-search-results](docs/botanist-search-results.png)
 
 ##requirements
 
