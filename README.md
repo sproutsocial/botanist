@@ -4,7 +4,9 @@ a web-based code search tool
 ##requirements
 
 * an ubuntu server
-* a username/password for a bitbucket.org account that has access to the repositories desired
+* a username/password for a bitbucket.org account that has access to the repositories desired to be indexed
+* a username/password or username/access_token for a github.com account that has access to repositories desired to be indexed
+* apache, nginx, or any other WSGI server for the Django webapp.
 
 ##build / installation
 
