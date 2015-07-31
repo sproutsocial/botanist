@@ -36,16 +36,26 @@ in a file that is only readable by the user it is installed under.
 
 #packages
 
+some software packages are included to make this work. they are included
+in this repository for now for compatibility purposes.
+
 ##code search
+The fast searching is made possible by the excellent codesearch tool
+from Google:
+
 https://code.google.com/p/codesearch/
 (cindex running on a periodic cron to re-index)
 
-##repository fetching
+##bitbucket repository fetching
 https://github.com/samkuehn/bitbucket-backup
 (running on a periodic cron to update the source code to search)
 NOTE: Enclosed under ./packages is a custom fork of
 samkeuhn/bitbucket-backup. I've issued several PR's that he's accepted
 so he is really quick and amenable to updates, I just haven't quite
 finished cleaning up the additions I made recently.
+
+##github repository fetching
+wrote up something to do this in Python based on
+https://github.com/celeen/gitter
 
 ##pull requests welcome! checkout the TODOs file
