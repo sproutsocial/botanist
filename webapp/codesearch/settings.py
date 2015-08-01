@@ -90,7 +90,10 @@ config = SafeConfigParser()
 config.read(os.path.join(BASE_DIR, 'webapp.conf'))
 CODE_ROOT = config.get('main', 'CODE_ROOT')
 BIN_PATH = config.get('main', 'BIN_PATH')
-ORG_NAME = config.get('main', 'ORG_NAME')
+ORG_NAMES = {
+    'bitbucket': config.get('main', 'BB_TEAM'),
+    'github': config.get('main', 'GH_ORG'),
+}
 
 LOGGING = {
     'version': 1,

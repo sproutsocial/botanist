@@ -17,14 +17,19 @@ from django.shortcuts import render
 
 from codesearch.settings import BIN_PATH
 from codesearch.settings import CODE_ROOT
-from codesearch.settings import ORG_NAME
+from codesearch.settings import ORG_NAMES
 
 
 HIGHLIGHT_QUERY_TEMPLATE = r'<span class="highlighted-search-query">\1</span>'
-BB_DEEP_LINK_FMT = 'https://bitbucket.org/%(orgname)s/%(repo)s/src/tip/%(fpath)s'
-BB_LINENO_SUFFIX_FMT = '#cl-%s'
-GH_DEEP_LINK_FMT = 'https://github.com/%(orgname)s/%(repo)s/blob/master/%(fpath)s'
-GH_LINENO_SUFFIX_FMT = '#L%s'
+DEEP_LINK_TEMPLATES = {
+    'bitbucket': 'https://bitbucket.org/%(orgname)s/%(repo)s/src/tip/%(fpath)s',
+    'github': 'https://github.com/%(orgname)s/%(repo)s/blob/master/%(fpath)s',
+}
+LINENO_TEMPLATES = {
+    'bitbucket': '#cl-%s',
+    'github': '#L%s',
+}
+
 
 log = logging.getLogger(__name__)
 
@@ -170,11 +175,11 @@ def deep_link(vcs_loc, reponame, filepath, lineno=None):
     if vcs_loc not in ('github', 'bitbucket'):
         raise ValueError('unknown vcs location: %s' % vcs_loc)
 
-    fmt = BB_DEEP_LINK_FMT if vcs_loc == 'bitbucket' else GH_DEEP_LINK_FMT
-    lineno_suffix_fmt = BB_LINENO_SUFFIX_FMT if vcs_loc == 'bitbucket' else GH_LINENO_SUFFIX_FMT
+    fmt = DEEP_LINK_TEMPLATES[vcs_loc]
+    lineno_suffix_fmt = LINENO_TEMPLATES[vcs_loc]
 
-    kwargs = {'orgname': ORG_NAME, 'repo': reponame, 'fpath': filepath}
-    link = fmt % kwargs
+    args = {'orgname': ORG_NAMES[vcs_loc], 'repo': reponame, 'fpath': filepath}
+    link = fmt % args
     link += lineno_suffix_fmt % lineno if lineno else ''
 
     return link

@@ -49,7 +49,7 @@ mv ./github_backup.py $BIN
 # configure fetch-code.sh cron
 ####################################################
 cd $INSTALL_DIR
-read -r -p "Do wish to connect to bitbucket? [y/N] " bbanswer
+read -r -p "Do you wish to connect to bitbucket? [y/N] " bbanswer
 if [[ $bbanswer == 'y' ]]; then
 	echo -n "Enter the bitbucket.org username : "
 	read bbusername
@@ -57,7 +57,6 @@ if [[ $bbanswer == 'y' ]]; then
 	read -s bbpassword
 	echo -e -n "\nEnter the bitbucket.org team/org : "
 	read bbteam
-	echo -e "\n"
 	sed -i \
 	    -e "s/%RUNASUSER%/$USER/" \
     	-e "s/%BB_USERNAME%/$bbusername/" \
@@ -124,7 +123,8 @@ virtualenv .env
 . .env/bin/activate
 pip install -r requirements.txt
 touch $WEBAPP/webapp.conf
-# TODO: only supports bitbucket for now
-sed -e "s#%CODEROOT%#$REPOS/bitbucket#" \
+sed -e "s#%CODEROOT%#$REPOS#" \
     -e "s#%BINPATH%#$BIN#" \
+    -e "s#%BB_TEAM%#$bbteam#" \
+    -e "s#%GH_ORG%#$ghorg#" \
     $WEBAPP/webapp.conf.template > $WEBAPP/webapp.conf
