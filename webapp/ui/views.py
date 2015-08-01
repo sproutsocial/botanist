@@ -1,6 +1,5 @@
 import json
 import logging
-import os
 import pipes
 import re
 import time
@@ -8,6 +7,7 @@ import time
 from collections import OrderedDict
 from subprocess import Popen
 from subprocess import PIPE
+from os import path
 
 from django.http import HttpResponse
 from django.http import HttpResponseBadRequest
@@ -26,8 +26,8 @@ DEEP_LINK_TEMPLATES = {
     'github': 'https://github.com/%(orgname)s/%(repo)s/blob/master/%(fpath)s',
 }
 LINENO_TEMPLATES = {
-    'bitbucket': '#cl-%s',
-    'github': '#L%s',
+    'bitbucket': '%s-%s',
+    'github': 'L%s',
 }
 
 
@@ -86,7 +86,7 @@ def do_search(query, case_sensitive=True):
     safe_query = pipes.quote(query)
 
     case_arg = '' if case_sensitive else  '-i'
-    executable = os.path.join(BIN_PATH, 'csearch')
+    executable = path.join(BIN_PATH, 'csearch')
     cmd = '%s -n %s %s' % (executable, case_arg, safe_query)
 
     p = Popen([cmd], stdout=PIPE, shell=True)
@@ -166,7 +166,7 @@ def is_vcs_folder(filename):
 
 
 def get_repo_and_filepath(fully_qualified_filename):
-    relpath = os.path.relpath(fully_qualified_filename, CODE_ROOT)
+    relpath = path.relpath(fully_qualified_filename, CODE_ROOT)
     vcs_loc, reponame, rel_file_path = relpath.split('/', 2)
     return vcs_loc, reponame, rel_file_path
 
@@ -177,9 +177,11 @@ def deep_link(vcs_loc, reponame, filepath, lineno=None):
 
     fmt = DEEP_LINK_TEMPLATES[vcs_loc]
     lineno_suffix_fmt = LINENO_TEMPLATES[vcs_loc]
+    src_file = path.split(filepath)[-1]
+    lineno_suffix_args = (src_file, lineno) if vcs_loc == 'bitbucket' else (lineno,)
 
     args = {'orgname': ORG_NAMES[vcs_loc], 'repo': reponame, 'fpath': filepath}
     link = fmt % args
-    link += lineno_suffix_fmt % lineno if lineno else ''
+    link += '#' + lineno_suffix_fmt % lineno_suffix_args if lineno else ''
 
     return link

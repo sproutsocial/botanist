@@ -71,7 +71,7 @@ class SearchResultsParser(TestCase):
         vcs_loc, reponame, filename = get_repo_and_filepath(filename)
         dl = deep_link(vcs_loc, reponame, filename, lineno=42)
 
-        self.assertEqual('https://bitbucket.org/bborgname/repositoryname/src/tip/somedir/sourcefile.py#cl-42', dl)
+        self.assertEqual('https://bitbucket.org/bborgname/repositoryname/src/tip/somedir/sourcefile.py#sourcefile.py-42', dl)
 
     def test_deep_link_github(self, ORG_NAMES):
         self._setupmock(ORG_NAMES)
