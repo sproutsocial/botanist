@@ -44,7 +44,11 @@ if ( set -o noclobber; echo "$$" > "$lockfile") 2> /dev/null; then
 
         log "Starting fetching/updating bitbucket.org repositories..."
         mkdir -p $LOG_DIR
-        $BIN/bitbucket-backup/backup.py $USE_HTTP -u $BB_USERNAME -l $BITBUCKET -p $BB_PASSWORD -t $BITBUCKET_TEAM -v --ignore-repo-list $IGNORE_REPO_LIST 2>&1
+        if [ -n "$IGNORE_REPO_LIST" ]; then
+            $BIN/bitbucket-backup/backup.py $USE_HTTP -u $BB_USERNAME -l $BITBUCKET -p $BB_PASSWORD -t $BITBUCKET_TEAM -v --ignore-repo-list $IGNORE_REPO_LIST 2>&1
+        else
+            $BIN/bitbucket-backup/backup.py $USE_HTTP -u $BB_USERNAME -l $BITBUCKET -p $BB_PASSWORD -t $BITBUCKET_TEAM -v 2>&1
+        fi
 
     fi
 
