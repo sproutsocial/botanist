@@ -69,11 +69,11 @@ fi
 
 read -r -p "Do you wish to connect to github? [y/N]" ghanswer
 if [[ $ghanswer == 'y' ]]; then
-	echo -n "Enter the github.com username :"
+	echo -n "Enter the github.com username : "
 	read ghusername
-	echo -n "Enter the github.com password or access token :"
+	echo -n "Enter the github.com password or access token : "
    read -s ghpassword
-	echo -e -n "\nEnter the github.com team/org :"
+	echo -e -n "\nEnter the github.com team/org : "
    read ghorg
 	sed -i \
 	    -e "s/%RUNASUSER%/$USER/" \
