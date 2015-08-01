@@ -21,7 +21,7 @@ build and upload to target server:
 
 ```
 make
-scp botanist.tar.gz dest-server:
+scp target/botanist.tar.gz dest-server:
 ```
 
 untar it on the target server, cd into the directory, and run `install.sh`
