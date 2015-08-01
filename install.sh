@@ -49,6 +49,7 @@ mv ./github_backup.py $BIN
 # configure fetch-code.sh cron
 ####################################################
 cd $INSTALL_DIR
+echo -e "\n"
 read -r -p "Do you wish to connect to bitbucket? [y/N] " bbanswer
 if [[ $bbanswer == 'y' ]]; then
 	echo -n "Enter the bitbucket.org username : "
@@ -114,6 +115,13 @@ crontab -l
 ####################################################
 echo -e "starting initial fetching of code in the background...\n"
 nohup $CRON/fetch-code.sh 2>&1 >> $LOGS/fetch-code.log &
+
+####################################################
+# kickoff cindex for first time in background on a
+# small delay so it has something to index
+####################################################
+echo -e "initial index run will commence in 1 minute...\n"
+( sleep 60; nohup $CRON/index.sh 2>&1 >> $LOGS/index.log ) &
 
 ###################
 # install webapp
