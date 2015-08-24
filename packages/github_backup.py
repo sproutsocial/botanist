@@ -41,7 +41,7 @@ class Helpers(object):
         print "Executing command: %s" % self.redact(command)
         resp = os.system(command)
         if resp != 0:
-            sys.exit("Command [%s] failed (%s)" % (command, resp))
+            raise Exception("Command [%s] failed (%s)" % (command, resp))
 
     def https_url_with_auth(self, base_url):
         _, suffix = base_url.split('https://')
@@ -164,8 +164,13 @@ if __name__ == '__main__':
         if os.path.exists(destdir):
             print '*** updating %s... ***' % h.redact(repo_path)
             with chdir(destdir):
-                h.exec_cmd('git pull %s' % repo_path)
+                try:
+                    h.exec_cmd('git pull %s' % repo_path)
+                except Exception as e:
+                    print 'error: %s' % e
         else:
             print '*** backing up %s... ***' % h.redact(repo_path)
-            h.exec_cmd('git clone %s %s' % (repo_path, destdir))
-
+            try:
+                h.exec_cmd('git clone %s %s' % (repo_path, destdir))
+            except Exception as e:
+                print 'error: %s' % e
