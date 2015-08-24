@@ -33,8 +33,21 @@ cd botanist
 
 ```
 
-You'll have to setup the webapp and start it using your favorite webserver that supports WSGI (Apache, Nginx, Gunicorn, etc.)
+Installation will setup 2 crons…
+will also kick off initial fetch-code and index jobs
+you can start up the django web app if you want to just check it out quickly by doing:
 
+```
+cd webapp/
+. .env/bin/activate
+./manage.py runserver 0.0.0.0:8000
+```
+
+Then you can visit [http://localhost:8000](http://localhost:8000) to start searching!
+
+Of course, Django's test server won't really work in production, so you'll have to setup the webapp to run using your favorite webserver that supports WSGI (Apache, Nginx, Gunicorn, etc.)
+
+TODO: need to reorder this...
 The installation script sets up 2 periodic crons that run every half hour:
 
 * one fetches new repositories or pulls the latest commits from bitbucket and/or github
