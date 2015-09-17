@@ -35,15 +35,15 @@ if __name__ == '__main__':
         sys.exit(1)
 
     for reponame in sorted(data.keys()):
-        vcs_loc = data[reponame]['vcs_loc']
-        files = data[reponame]['files']
-        for filename in sorted(files.keys()):
-            for srcline_obj in files[filename]:
-                srcline = srcline_obj.get('srcline')
-                if srcline is None:
-                    continue
-                lineno = srcline_obj.get('lineno')
-                if lineno is None:
-                    continue
+        for vcs_loc, repo_result_dict in data[reponame].items():
+            files = repo_result_dict['files']
+            for filename in sorted(files.keys()):
+                for srcline_obj in files[filename]:
+                    srcline = srcline_obj.get('srcline')
+                    if srcline is None:
+                        continue
+                    lineno = srcline_obj.get('lineno')
+                    if lineno is None:
+                        continue
 
-                print '%s:%s:%s:%s:%s' % (get_vcs_prefix(vcs_loc), reponame.encode('utf-8'), filename.encode('utf-8'), lineno, srcline.encode('utf-8'))
+                    print '%s:%s:%s:%s:%s' % (get_vcs_prefix(vcs_loc), reponame.encode('utf-8'), filename.encode('utf-8'), lineno, srcline.encode('utf-8'))

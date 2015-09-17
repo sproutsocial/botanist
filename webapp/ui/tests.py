@@ -1,11 +1,17 @@
+import json
 import os
 from django.test import TestCase
 from mock import patch
 from codesearch.settings import CODE_ROOT
 from ui.views import deep_link
+from ui.views import parse_search_results
 from ui.views import get_query_re
 from ui.views import get_repo_and_filepath
 from ui.views import prepare_source_line
+
+
+FIXTURES_ROOT = os.path.join(os.path.dirname(__file__), 'fixtures')
+FX = lambda *relpath: os.path.join(FIXTURES_ROOT, *relpath)
 
 
 class PrepareSearchLine(TestCase):
@@ -53,7 +59,7 @@ class PrepareSearchLine(TestCase):
 
 
 @patch('ui.views.ORG_NAMES', spec_set=dict)
-class SearchResultsParser(TestCase):
+class GetRepoAndFilePath(TestCase):
 
     def test_deep_link_bitbucket(self, ORG_NAMES):
         self._setupmock(ORG_NAMES)
@@ -100,3 +106,15 @@ class SearchResultsParser(TestCase):
         m.__getitem__.side_effect = getitem
         m.__setitem__.side_effect = setitem
 
+
+@patch('ui.views.CODE_ROOT', '/opt/botanist/repos')
+class ParseSearchResults(TestCase):
+    def test_duplicate_repositories_in_github_and_bitbucket(self):
+        with open(FX('duplicate_repositories_in_github_and_bitbucket.results.txt')) as f:
+             output = f.read()
+
+        results, count = parse_search_results(output, 'AbstractSendTimeJob', True)
+        self.assertEqual(2, count)
+        self.assertListEqual(['bitbucket', 'github'], results['sproutjobs'].keys())
+        self.assertEqual('public abstract class AbstractJob implements Job {', results['sproutjobs']['bitbucket']['files']['src/main/java/com/sproutsocial/AbstractJob.java'][0]['srcline'])
+        self.assertEqual('public abstract class AbstractJob implements Job {', results['sproutjobs']['github']['files']['src/main/java/com/sproutsocial/AbstractJob.java'][0]['srcline'])

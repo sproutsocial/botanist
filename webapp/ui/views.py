@@ -144,12 +144,13 @@ def parse_search_results(result_text, query, case_sensitive=True, html=True):
                 'count': count}
             if reponame not in results:
                 results[reponame] = {}
-                results[reponame]['vcs_loc'] = vcs_loc
-                results[reponame]['files'] = OrderedDict()
-            if filename not in results[reponame]['files']:
-                results[reponame]['files'][filename] = []
+            if vcs_loc not in results[reponame]:
+                results[reponame][vcs_loc] = {}
+                results[reponame][vcs_loc]['files'] = OrderedDict()
+            if filename not in results[reponame][vcs_loc]['files']:
+                results[reponame][vcs_loc]['files'][filename] = []
 
-            results[reponame]['files'][filename].append(result)
+            results[reponame][vcs_loc]['files'][filename].append(result)
         except ValueError as e:
             log.error('ValueError: %s (cause: %s)', fields, e)
 

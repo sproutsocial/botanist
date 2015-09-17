@@ -172,6 +172,10 @@ img.vcs_loc {
     height: 13px;
 }
 
+.vcs_loc_text {
+    font-size:7pt;
+}
+
 .error {
     margin-top: 8px;
     font-size: 8pt;

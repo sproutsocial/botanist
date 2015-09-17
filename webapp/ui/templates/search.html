@@ -4,8 +4,6 @@
 <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/styles/mono-blue.min.css">
 {#<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/styles/ascetic.min.css">#}
 {#<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/styles/solarized_dark.min.css">#}
-<script>
-</script>
 
 <div class="container">
 <div class="header">
@@ -22,42 +20,45 @@
     {% if error %}
         <div class="error">error: {{ error }}</div>
     {% else %}
-    <div id="search-results-summary">
-        {{ result_count }} results found in {{ results|length }} repos ({{ time }})
-    </div>
-    </div>
-    <div class="content">
-        <div class="wrapper">
-            <div class="left-nav">
-                {% for reponame, repo_result_data in results.items %}
-                    {% if repo_result_data.vcs_loc == "bitbucket" %}
-                        <img src="{%  static 'bitbucket.favicon.ico' %}" class="vcs_loc" />
-                    {% elif repo_result_data.vcs_loc == "github" %}
-                        <img src="{% static 'github.favicon.ico' %}" class="vcs_loc" />
+        <div id="search-results-summary">{{ result_count }} results found in {{ results|length }} repos ({{ time }})</div>
+    {% endif %}
+</div>
+<div class="content">
+    <div class="wrapper">
+        <div class="left-nav">
+            {% for reponame, vcs_result_dict in results.items %}
+                {% for vcs_loc, repo_result_data in vcs_result_dict.items %}
+                    {% if vcs_loc == "bitbucket" %}
+                        <img src="{% static 'bitbucket.favicon.ico' %}" class="vcs_loc"/>
+                    {% elif vcs_loc == "github" %}
+                        <img src="{% static 'github.favicon.ico' %}" class="vcs_loc"/>
                     {% endif %}
-                    <a href="#{{ reponame }}" class="reponame-nav">{{ reponame }}</a><br>
+                    <a href="#{{ reponame }}_{{ vcs_loc }}" class="reponame-nav">{{ reponame }}</a><br>
                 {% endfor %}
-            </div>
-            <div class="search-results">
-                {% for reponame, repo_result_data in results.items %}
-                    <div id="{{ reponame }}">
-                        <div class="reponame">{{ reponame }}</div>
+            {% endfor %}
+        </div>
+        <div class="search-results">
+            {% for reponame, vcs_result_dict in results.items %}
+                {% for vcs_loc, repo_result_data in vcs_result_dict.items %}
+                <div id="{{ reponame }}_{{ vcs_loc }}">
+                    <div class="reponame">{{ reponame }} <span class="vcs_loc_text">{{ vcs_loc }}</span></div>
                         {% for filename, matches in repo_result_data.files.items %}
                             <div id="{{ filename }}" class="filename">
                                 <span class="filename-text">{{ filename }}</span>
                                 {% for r in matches %}
-                                    <pre><code><a href="{{ r.deeplink }}" target="_blank" title="{{ r.lineno }}" class="source-code-link">{{ r.lineno }}: {{ r.srcline|safe }}</a></code></pre>
+                                    <pre><code><a href="{{ r.deeplink }}"
+                                                  target="_blank"
+                                                  title="{{ r.lineno }}"
+                                                  class="source-code-link">{{ r.lineno }}: {{ r.srcline|safe }}</a></code></pre>
                                 {% endfor %}
                                 <br>
                             </div>
                         {% endfor %}
-                    </div>
+                </div>
                 {% endfor %}
-            </div>
+            {% endfor %}
         </div>
     </div>
-    <div class="header">
-        (╯°□°)╯︵ ┻━┻
-    </div>
 </div>
-{% endif %}
+<div class="header">(╯°□°)╯︵ ┻━┻</div>
+</div>
