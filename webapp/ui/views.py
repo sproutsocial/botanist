@@ -18,12 +18,12 @@ from django.shortcuts import render
 from codesearch.settings import BIN_PATH
 from codesearch.settings import CODE_ROOT
 from codesearch.settings import ORG_NAMES
-
+from ui.util import get_repo_type
 
 HIGHLIGHT_QUERY_TEMPLATE = r'<span class="highlighted-search-query">\1</span>'
 DEEP_LINK_TEMPLATES = {
-    'bitbucket': 'https://bitbucket.org/%(orgname)s/%(repo)s/src/tip/%(fpath)s',
-    'github': 'https://github.com/%(orgname)s/%(repo)s/blob/master/%(fpath)s',
+    'bitbucket': 'https://bitbucket.org/%(orgname)s/%(repo)s/src/%(branch)s/%(fpath)s',
+    'github': 'https://github.com/%(orgname)s/%(repo)s/blob/%(branch)s/%(fpath)s',
 }
 LINENO_TEMPLATES = {
     'bitbucket': '%s-%s',
@@ -130,7 +130,7 @@ def parse_search_results(result_text, query, case_sensitive=True, html=True):
             # codesearch's line #s are off by one
             # https://github.com/google/codesearch/issues/25
             lineno = str(long(lineno)+1)
-            vcs_loc, reponame, filename = get_repo_and_filepath(filename)
+            vcs_loc, repo_name, filename, repo_type = get_repo_and_filepath(filename)
             if is_vcs_folder(filename):
                 continue
 
@@ -140,17 +140,17 @@ def parse_search_results(result_text, query, case_sensitive=True, html=True):
                 'filename': filename,
                 'lineno': long(lineno),
                 'srcline': prepare_source_line(query_re, srcline, html),
-                'deeplink': deep_link(vcs_loc, reponame, filename, lineno),
+                'deeplink': deep_link(vcs_loc, repo_name, filename, repo_type, lineno),
                 'count': count}
-            if reponame not in results:
-                results[reponame] = {}
-            if vcs_loc not in results[reponame]:
-                results[reponame][vcs_loc] = {}
-                results[reponame][vcs_loc]['files'] = OrderedDict()
-            if filename not in results[reponame][vcs_loc]['files']:
-                results[reponame][vcs_loc]['files'][filename] = []
+            if repo_name not in results:
+                results[repo_name] = {}
+            if vcs_loc not in results[repo_name]:
+                results[repo_name][vcs_loc] = {}
+                results[repo_name][vcs_loc]['files'] = OrderedDict()
+            if filename not in results[repo_name][vcs_loc]['files']:
+                results[repo_name][vcs_loc]['files'][filename] = []
 
-            results[reponame][vcs_loc]['files'][filename].append(result)
+            results[repo_name][vcs_loc]['files'][filename].append(result)
         except ValueError as e:
             log.error('ValueError: %s (cause: %s)', fields, e)
 
@@ -169,19 +169,22 @@ def is_vcs_folder(filename):
 def get_repo_and_filepath(fully_qualified_filename):
     relpath = path.relpath(fully_qualified_filename, CODE_ROOT)
     vcs_loc, reponame, rel_file_path = relpath.split('/', 2)
-    return vcs_loc, reponame, rel_file_path
+    repo_type = get_repo_type(path.join(CODE_ROOT, vcs_loc, reponame))
+    return vcs_loc, reponame, rel_file_path, repo_type
 
 
-def deep_link(vcs_loc, reponame, filepath, lineno=None):
+def deep_link(vcs_loc, reponame, filepath, repo_type, lineno=None):
     if vcs_loc not in ('github', 'bitbucket'):
         raise ValueError('unknown vcs location: %s' % vcs_loc)
+
+    branch = 'default' if repo_type == 'hg' else 'master'
 
     fmt = DEEP_LINK_TEMPLATES[vcs_loc]
     lineno_suffix_fmt = LINENO_TEMPLATES[vcs_loc]
     src_file = path.split(filepath)[-1]
     lineno_suffix_args = (src_file, lineno) if vcs_loc == 'bitbucket' else (lineno,)
 
-    args = {'orgname': ORG_NAMES[vcs_loc], 'repo': reponame, 'fpath': filepath}
+    args = {'orgname': ORG_NAMES[vcs_loc], 'repo': reponame, 'fpath': filepath, 'branch': branch}
     link = fmt % args
     link += '#' + lineno_suffix_fmt % lineno_suffix_args if lineno else ''
 
