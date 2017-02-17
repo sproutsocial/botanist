@@ -1,0 +1,24 @@
+FROM python:2.7.14 as collectstatic
+
+ADD webapp/requirements.txt /tmp
+RUN pip install -r /tmp/requirements.txt
+ADD ./webapp /code
+RUN /code/manage.py collectstatic --noinput
+
+# multistage builds are awesomeeee
+# https://docs.docker.com/engine/userguide/eng-image/multistage-build/#use-multi-stage-builds
+# FROM nginx:1.13.5
+# https://github.com/g17/nginx-ldap
+#TODO: vendor/pull in the source of this container in case it gets deleted like the last one :(
+FROM horalstvo/nginx-ldap
+
+# for envsubst
+RUN apt-get update && apt-get install -y gettext
+
+# from https://raw.githubusercontent.com/nginx/nginx/master/conf/uwsgi_params
+ADD uwsgi_params /etc/nginx/uwsgi_params
+ADD ./etc/nginx/nginx.conf.template /etc/nginx/nginx.conf.template
+
+COPY --from=collectstatic /code/botanist-static /data/static
+
+CMD /bin/bash -c "envsubst < /etc/nginx/nginx.conf.template > /etc/nginx/nginx.conf && dockerize -stdout /var/log/nginx/access.log -stderr /var/log/nginx/error.log /usr/sbin/nginx -g 'daemon off;'"

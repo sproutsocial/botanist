@@ -85,14 +85,14 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-# code search settings, read from webapp.conf
-config = SafeConfigParser()
-config.read(os.path.join(BASE_DIR, 'webapp.conf'))
-CODE_ROOT = config.get('main', 'CODE_ROOT')
-BIN_PATH = config.get('main', 'BIN_PATH')
+STATIC_ROOT = os.path.join(BASE_DIR, 'botanist-static')
+
+# envvars
+CODE_ROOT = os.getenv('CODE_ROOT', '/botanist/repos')
+BIN_PATH = os.getenv('BIN_PATH', '/botanist/bin/codesearch-0.01')
 ORG_NAMES = {
-    'bitbucket': config.get('main', 'BB_TEAM'),
-    'github': config.get('main', 'GH_ORG'),
+    'bitbucket': os.getenv('BB_TEAM'),
+    'github': os.getenv('GH_ORG'),
 }
 
 LOGGING = {
@@ -109,9 +109,8 @@ LOGGING = {
     'handlers': {
         'file': {
             'level': 'DEBUG',
-            'class': 'logging.FileHandler',
+            'class': 'logging.StreamHandler',
             'formatter': 'verbose',
-            'filename': './logs/webapp.log',
         },
     },
     'root': {
