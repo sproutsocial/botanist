@@ -41,7 +41,7 @@ class Helpers(object):
         print "Executing command: %s" % self.redact(command)
         resp = os.system(command)
         if resp != 0:
-            raise Exception("Command [%s] failed (%s)" % (command, resp))
+            raise Exception(self.redact("Command [%s] failed (%s)" % (command, resp)))
 
     def https_url_with_auth(self, base_url):
         _, suffix = base_url.split('https://')
