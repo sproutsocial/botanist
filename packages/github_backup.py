@@ -41,7 +41,7 @@ class Helpers(object):
         print "Executing command: %s" % self.redact(command)
         resp = os.system(command)
         if resp != 0:
-            raise Exception("Command [%s] failed (%s)" % (command, resp))
+            raise Exception(self.redact("Command [%s] failed (%s)" % (command, resp)))
 
     def https_url_with_auth(self, base_url):
         _, suffix = base_url.split('https://')
@@ -162,10 +162,11 @@ if __name__ == '__main__':
         else:
             repo_path = h.https_url_with_auth(repo['clone_url'])
         if os.path.exists(destdir):
+            # pull in new commits to an already tracked repository
             print '*** updating %s... ***' % h.redact(repo_path)
             with chdir(destdir):
                 try:
-                    h.exec_cmd('git pull %s' % repo_path)
+                    h.exec_cmd('git pull origin %s' % repo['default_branch'])
                 except Exception as e:
                     print 'error: %s' % e
         else:
