@@ -95,7 +95,8 @@ def get_repos(org, repo_type, access_token=None, username=None, password=None, p
 
     repos = json.loads(response.read())
     for r in repos:
-        yield r
+        if not r.get('archived'):
+            yield r
 
     # so, this isn't the DRYest code ;-)
     while pagination.next:
@@ -106,7 +107,8 @@ def get_repos(org, repo_type, access_token=None, username=None, password=None, p
         pagination = get_pagination(response.headers['Link'])
         repos = json.loads(response.read())
         for r in repos:
-            yield r
+            if not r.get('archived'):
+                yield r
 
 
 # Github API call, can authenticate via access token, or username and password
