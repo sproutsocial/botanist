@@ -1,4 +1,4 @@
-#botanist
+# botanist
 a web and command-line code search tool for teams.
 
 ## web search
@@ -9,13 +9,18 @@ a web and command-line code search tool for teams.
 ## command line search
 ![botanist-btgrep-command-line](docs/botanist-btgrep-command-line.png)
 
-#requirements
+# important note
+Botanist is now built to be deployed to a host via docker containers.
+
+See the docker instructions [section](#docker-instructions) below.
+
+# requirements
 
 * an ubuntu server
 * credentials for a user that has access to the repositories desired to be indexed (bitbucket.org and/or github.com) see: [Machine User](https://developer.github.com/guides/managing-deploy-keys/#machine-users)
 * apache, nginx, or any other WSGI server for the Django webapp.
 
-#build / installation
+# build / installation
 
 build and upload to target server:
 
@@ -57,19 +62,19 @@ During the installation process, it will ask you what user to run things
 as, as well as bitbucket and/or github credentials. It stores these
 in a file that is only readable by the user it is installed under.
 
-#packages
+# packages
 
 some software packages are included to make this work. they are included
 in this repository for now for compatibility purposes.
 
-##code search
+## code search
 The fast searching is made possible by the excellent codesearch tool
 from Google:
 
 https://code.google.com/p/codesearch/
 (cindex running on a periodic cron to re-index)
 
-##bitbucket repository fetching
+## bitbucket repository fetching
 https://github.com/samkuehn/bitbucket-backup
 (running on a periodic cron to update the source code to search)
 NOTE: Enclosed under ./packages is a custom fork of
@@ -77,8 +82,67 @@ samkeuhn/bitbucket-backup. I've issued several PR's that he's accepted
 so he is really quick and amenable to updates, I just haven't quite
 finished cleaning up the additions I made recently.
 
-##github repository fetching
+## github repository fetching
 wrote up something to do this in Python based on
 https://github.com/celeen/gitter
 
-##pull requests welcome! checkout the TODOs file
+## pull requests welcome! checkout the TODOs file
+
+# docker instructions
+
+## running locally
+### 
+
+Create a folder somewhere on the host or your local laptop where the code repositories will be stored.
+
+```
+# create location for repositories on disk
+mkdir -p $HOME/botanist/repos
+
+# copy env file to env.local
+cp env.template env.local
+
+# build latest version of botanist image locally
+docker build -t botanist .
+
+# fetch code repositories using the latest image you just built
+docker run --env-file env.local -v $HOME/botanist/repos:/botanist/repos botanist /botanist/bin/fetch-code.sh
+
+# index the code repositories using the image you just built
+docker run --env-file env.local -v $HOME/botanist/repos:/botanist/repos botanist /botanist/bin/index.sh
+
+# run a fully working botanist locally
+docker-compose -f docker-compose.local.yml rm -f && docker-compose -f docker-compose.local.yml up --build
+```
+
+### create a viable `env` file
+
+TODO:
+
+### periodically fetch new commits/repositories
+
+In order to ensure the search index includes all the latest changes to your org's repositories, this should be done periodically (either via cron on the host machine or a `CronJob` in Kubernetes). I recommend re-fetching ~once every hour.
+
+```
+docker run --env-file env -v $HOME/botanist/repos:/botanist/repos botanist /botanist/bin/fetch-code.sh
+```
+
+### periodically (re-)index code
+The search index must be updated after new code is fetched. This should also be run periodically (either via cron on the host machine or a `CronJob` in Kubernetes), at a frequency similar to fetching code.
+
+```
+docker run --env-file env -v $HOME/botanist/repos:/botanist/repos botanist /botanist/bin/index.sh
+```
+
+### deploy the webapp and nginx
+
+These must be run on the same host machine (or with access to the same persistent volume) as the fetch and index periodic jobs run on.
+
+Note: This uses nginx configured with LDAP for authentication and SSL.
+
+### Run Locally
+```
+docker-compose -f docker-compose.local.yml rm -f && docker-compose -f docker-compose.local.yml up --build
+```
+
+You can authenticate by using the `test` LDAP user who's password is `t3st`, which is created upon startup when running `docker-compose.local.yml` via the `ldapinit` container described in `Dockerfile.ldapinit`.

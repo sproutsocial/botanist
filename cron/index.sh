@@ -4,10 +4,8 @@
 # reindex source code repositories
 ###################################
 
-USER=vagrant
-INSTALL_DIR=/home/$USER/botanist
-BIN=$INSTALL_DIR/bin
-REPOS=$INSTALL_DIR/repos
+BIN=/botanist/bin
+REPOS=/botanist/repos
 
 lockfile=/var/tmp/index.lock
 
@@ -26,7 +24,7 @@ if ( set -o noclobber; echo "$$" > "$lockfile") 2> /dev/null; then
     cd $REPOS
 
     # index everything at once or else index can get borked
-    $BIN/cindex $REPOS
+    $BIN/codesearch-0.01/cindex $REPOS
 
     log "Finished."
     # clean up after yourself, and release your trap

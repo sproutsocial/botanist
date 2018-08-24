@@ -11,6 +11,7 @@ from os import path
 
 from django.http import HttpResponse
 from django.http import HttpResponseBadRequest
+from django.http import HttpResponseServerError
 from django.utils.html import escape
 
 from django.shortcuts import render
@@ -30,10 +31,14 @@ LINENO_TEMPLATES = {
     'github': 'L%s',
 }
 
+E_UNABLE_TO_SEARCH = 'unable to search.'
 
 log = logging.getLogger(__name__)
 
 class RegexError(Exception):
+    pass
+
+class CSearchMissingError(Exception):
     pass
 
 def index(request):
@@ -46,7 +51,11 @@ def search(request):
         return HttpResponseBadRequest()
 
     s = time.time()
-    output = do_search(query, case_sensitive)
+    try:
+        output = do_search(query, case_sensitive)
+    except CSearchMissingError as e:
+        log.error('problem executing csearch: %s', e)
+        return HttpResponseServerError(E_UNABLE_TO_SEARCH)
 
     results, count, error = None, None, None
     try:
@@ -65,7 +74,12 @@ def search_json(request):
     if query is None:
         return HttpResponseBadRequest()
 
-    output = do_search(query, case_sensitive)
+    try:
+        output = do_search(query, case_sensitive)
+    except CSearchMissingError as e:
+        log.error('problem executing csearch: %s', e)
+        return render_json({'error': E_UNABLE_TO_SEARCH}, status_code=500)
+
     results, count, error = None, None, None
     try:
         results, count = parse_search_results(output, query, case_sensitive, html=False)
@@ -75,8 +89,8 @@ def search_json(request):
     return render_json({'results': results, 'count': count, 'error': error})
 
 
-def render_json(data):
-    return HttpResponse(json.dumps({'data': data}), content_type="application/json")
+def render_json(data, status_code=200):
+    return HttpResponse(json.dumps({'data': data}), content_type="application/json", status_code=status_code)
 
 ###### to be refactored
 
@@ -85,12 +99,17 @@ def do_search(query, case_sensitive=True):
     # prevents shell code injection
     safe_query = pipes.quote(query)
 
-    case_arg = '' if case_sensitive else  '-i'
+    case_arg = '' if case_sensitive else '-i'
     executable = path.join(BIN_PATH, 'csearch')
     cmd = '%s -n %s %s' % (executable, case_arg, safe_query)
+    log.info('cmd = %s', cmd)
 
-    p = Popen([cmd], stdout=PIPE, shell=True)
+    p = Popen([cmd], stdout=PIPE, stderr=PIPE, shell=True)
     out, err = p.communicate()
+    log.info('csearch return code = %d', p.returncode)
+    if p.returncode > 1: # not zero, see the source for csearch
+        raise CSearchMissingError(err)
+
     return out
 
 
