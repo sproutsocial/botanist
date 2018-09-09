@@ -41,7 +41,6 @@ class GetRepoAndFilepath(TestMixin, TestCase):
         self.assertEqual(('bitbucket', 'org-name/git-repo-name', 'somedir/sourcefile.py', 'git'), result_tuple)
 
 
-@patch('ui.views.ORG_NAMES', spec_set=dict)
 @patch('ui.views.CODE_ROOT', CODE_ROOT)
 class DeepLink(TestMixin, TestCase):
     BB_GIT_REPO_PATH = FX(CODE_ROOT, 'bitbucket/org-name/git-repo-name')
@@ -57,37 +56,37 @@ class DeepLink(TestMixin, TestCase):
         os.system('rm -rf %s' % FX(CODE_ROOT, 'github'))
         os.system('rm -rf %s' % FX(CODE_ROOT, 'bitbucket'))
 
-    def test_deep_link_bitbucket_git(self, ORG_NAMES):
+    def test_deep_link_bitbucket_git(self):
         filename = os.path.join(CODE_ROOT, 'bitbucket', 'org-name', 'git-repo-name', 'somedir', 'sourcefile.py')
         dl = deep_link(*get_repo_and_filepath(filename))
 
         self.assertEqual('https://bitbucket.org/org-name/git-repo-name/src/master/somedir/sourcefile.py', dl)
 
-    def test_deep_link_bitbucket_hg(self, ORG_NAMES):
+    def test_deep_link_bitbucket_hg(self):
         filename = os.path.join(CODE_ROOT, 'bitbucket', 'org-name', 'hg-repo-name', 'somedir', 'sourcefile.py')
         dl = deep_link(*get_repo_and_filepath(filename))
 
         self.assertEqual('https://bitbucket.org/org-name/hg-repo-name/src/default/somedir/sourcefile.py', dl)
 
-    def test_deep_link_bitbucket_git_with_lineno(self, ORG_NAMES):
+    def test_deep_link_bitbucket_git_with_lineno(self):
         filename = os.path.join(CODE_ROOT, 'bitbucket', 'org-name', 'git-repo-name', 'somedir', 'sourcefile.py')
         dl = deep_link(*get_repo_and_filepath(filename), lineno=42)
 
         self.assertEqual('https://bitbucket.org/org-name/git-repo-name/src/master/somedir/sourcefile.py#sourcefile.py-42', dl)
 
-    def test_deep_link_bitbucket_hg_with_lineno(self, ORG_NAMES):
+    def test_deep_link_bitbucket_hg_with_lineno(self):
         filename = os.path.join(CODE_ROOT, 'bitbucket', 'org-name', 'hg-repo-name', 'somedir', 'sourcefile.py')
         dl = deep_link(*get_repo_and_filepath(filename), lineno=42)
 
         self.assertEqual('https://bitbucket.org/org-name/hg-repo-name/src/default/somedir/sourcefile.py#sourcefile.py-42', dl)
 
-    def test_deep_link_github(self, ORG_NAMES):
+    def test_deep_link_github(self):
         filename = os.path.join(CODE_ROOT, 'github', 'org-name', 'repositoryname', 'somedir', 'sourcefile.py')
         dl = deep_link(*get_repo_and_filepath(filename))
 
         self.assertEqual('https://github.com/org-name/repositoryname/blob/master/somedir/sourcefile.py', dl)
 
-    def test_deep_link_github_with_lineno(self, ORG_NAMES):
+    def test_deep_link_github_with_lineno(self):
         filename = os.path.join(CODE_ROOT, 'github', 'org-name', 'repositoryname', 'somedir', 'sourcefile.py')
         dl = deep_link(*get_repo_and_filepath(filename), lineno=42)
 

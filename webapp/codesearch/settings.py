@@ -90,10 +90,6 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'botanist-static')
 # envvars
 CODE_ROOT = os.getenv('CODE_ROOT', '/botanist/repos')
 BIN_PATH = os.getenv('BIN_PATH', '/botanist/bin/codesearch-0.01')
-ORG_NAMES = {
-    'bitbucket': os.getenv('BB_TEAM'),
-    'github': os.getenv('GH_ORG'),
-}
 
 LOGGING = {
     'version': 1,

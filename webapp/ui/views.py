@@ -18,7 +18,6 @@ from django.shortcuts import render
 
 from codesearch.settings import BIN_PATH
 from codesearch.settings import CODE_ROOT
-from codesearch.settings import ORG_NAMES
 from ui.util import get_repo_type
 
 HIGHLIGHT_QUERY_TEMPLATE = r'<span class="highlighted-search-query">\1</span>'
