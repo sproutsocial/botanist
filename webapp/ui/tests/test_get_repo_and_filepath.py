@@ -38,6 +38,7 @@ class GetRepoAndFilepath(TestMixin, TestCase):
     def test_get_repo_and_filepath(self):
         filename = os.path.join(CODE_ROOT, 'bitbucket', 'org-name', 'git-repo-name', 'somedir', 'sourcefile.py')
         result_tuple = get_repo_and_filepath(filename)
+        self.assertEqual(('bitbucket', 'org-name/git-repo-name', 'somedir/sourcefile.py', 'git'), result_tuple)
 
 
 @patch('ui.views.ORG_NAMES', spec_set=dict)
