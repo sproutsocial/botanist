@@ -52,10 +52,8 @@ http {
          auth_ldap_servers ldapserver;
          uwsgi_pass django;
          include /etc/nginx/uwsgi_params;
-         # wait up to 3 minutes instead of the 1 minute default
-         # sometimes you just need to search for something obscure in our code :)
          # http://nginx.org/en/docs/http/ngx_http_uwsgi_module.html#uwsgi_read_timeout
-         uwsgi_read_timeout 180s;
+         uwsgi_read_timeout 60s;
       }
 
       access_log /var/log/nginx/access.log;
