@@ -10,14 +10,6 @@ from ui.views import parse_search_results
 FIXTURES_ROOT = os.path.join(os.path.dirname(__file__), 'fixtures')
 FX = lambda *relpath: os.path.join(FIXTURES_ROOT, *relpath)
 
-def dump_keys(d, depth=0):
-    for k in d:
-        print '%s%s' % ('\t'*depth, k)
-        if isinstance(d[k], dict):
-            dump_keys(d[k], depth=depth + 1)
-        else:
-            print '\t'*depth + '---'
-
 
 @patch('ui.views.get_repo_type')
 @patch('ui.views.CODE_ROOT', '/botanist/repos')
@@ -27,9 +19,6 @@ class ParseSearchResults(TestCase):
             output = f.read()
 
         results, count = parse_search_results(output, 'facebook_comment', True)
-        # print results, count
-        # print json.dumps(results[results.keys()[0]], indent=2, sort_keys=True)
-        # dump_keys(results)
 
         self.assertEqual(4, count)
         self.assertEqual(2, len(results['org1/repo1']['github']['files']))
@@ -52,9 +41,6 @@ class ParseSearchResults(TestCase):
              output = f.read()
 
         results, count = parse_search_results(output, 'AbstractSendTimeJob', True)
-        # print results, count
-        # print json.dumps(results[results.keys()[0]], indent=2, sort_keys=True)
-        # dump_keys(results)
 
         self.assertEqual(2, count)
         self.assertListEqual(['bitbucket', 'github'], results['org1/sproutjobs'].keys())
