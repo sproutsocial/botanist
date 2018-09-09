@@ -7,7 +7,7 @@ RUN /code/manage.py collectstatic --noinput
 
 # multistage builds are awesomeeee
 # https://docs.docker.com/engine/userguide/eng-image/multistage-build/#use-multi-stage-builds
-FROM stantonk/nginx-ldap:1.0.0
+FROM stantonk/nginx-ldap:1.0.1
 
 # for envsubst
 RUN apt-get update && apt-get install -y gettext
