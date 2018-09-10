@@ -86,7 +86,7 @@ finished cleaning up the additions I made recently.
 wrote up something to do this in Python based on
 https://github.com/celeen/gitter
 
-## pull requests welcome! checkout the TODOs file
+## pull requests welcome!
 
 # docker instructions
 
@@ -99,20 +99,25 @@ Create a folder somewhere on the host or your local laptop where the code reposi
 # create location for repositories on disk
 mkdir -p $HOME/botanist/repos
 
-# copy env file to env.local
+# copy env file to env.local, and
+# set GH_USER, GH_ORGS, GH_PW so you can fetch code to index
 cp env.template env.local
 
-# build latest version of botanist image locally
-docker build -t botanist .
-
-# fetch code repositories using the latest image you just built
-docker run --env-file env.local -v $HOME/botanist/repos:/botanist/repos botanist /botanist/bin/fetch-code.sh
-
-# index the code repositories using the image you just built
-docker run --env-file env.local -v $HOME/botanist/repos:/botanist/repos botanist /botanist/bin/index.sh
+# build latest version of botanist images locally
+docker-compose -f docker-compose.local.yml rm -f
+docker-compose -f docker-compose.local.yml build
 
 # run a fully working botanist locally
-docker-compose -f docker-compose.local.yml rm -f && docker-compose -f docker-compose.local.yml up --build
+docker-compose -f docker-compose.local.yml up -d
+
+*NOTE* you can login by going to https://localhost and login as test:t3st
+
+# fetch code repositories using the latest image you just built
+docker run --env-file env.local -v $HOME/botanist/repos:/botanist/repos botanist_web /botanist/bin/fetch-code.sh
+
+# index the code repositories using the image you just built
+docker run --env-file env.local -v $HOME/botanist/repos:/botanist/repos botanist_web /botanist/bin/index.sh
+
 ```
 
 ### create a viable `env` file

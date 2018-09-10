@@ -32,11 +32,16 @@ if ( set -o noclobber; echo "$$" > "$lockfile") 2> /dev/null; then
 
         log "Starting fetching/updating bitbucket.org repositories..."
 
-        if [ -n "$BB_IGNORE_REPO_LIST" ]; then
-            $BIN/bitbucket-backup/backup.py $BB_USE_HTTP -u $BB_USER -l $BITBUCKET -p $BB_PW -t $BB_TEAM -v --ignore-repo-list $IGNORE_REPO_LIST 2>&1
-        else
-            $BIN/bitbucket-backup/backup.py $BB_USE_HTTP -u $BB_USER -l $BITBUCKET -p $BB_PW -t $BB_TEAM -v 2>&1
-        fi
+
+        IFS=',' read -ra ADDR <<< "$BB_TEAMS"
+        for BBO in "${ADDR[@]}"; do
+            echo "fetching for org $BBO..."
+            if [ -n "$BB_IGNORE_REPO_LIST" ]; then
+                $BIN/bitbucket-backup/backup.py $BB_USE_HTTP -u $BB_USER -l $BITBUCKET/$BBO -p $BB_PW -t $BBO -v --ignore-repo-list $IGNORE_REPO_LIST 2>&1
+            else
+                $BIN/bitbucket-backup/backup.py $BB_USE_HTTP -u $BB_USER -l $BITBUCKET/$BBO -p $BB_PW -t $BBO -v 2>&1
+            fi
+        done
 
     fi
 
@@ -44,7 +49,12 @@ if ( set -o noclobber; echo "$$" > "$lockfile") 2> /dev/null; then
 
         log "Starting fetching/updating github.com repositories..."
 
-        $BIN/github_backup.py https -u $GH_USER -p $GH_PW -o $GH_ORG -d $GITHUB 2>&1
+        IFS=',' read -ra ADDR <<< "$GH_ORGS"
+        for GHO in "${ADDR[@]}"; do
+            echo "fetching for org $GHO..."
+            $BIN/github_backup.py https -u $GH_USER -p $GH_PW -o $GHO -d $GITHUB/$GHO 2>&1
+        done
+
 
     fi
 
