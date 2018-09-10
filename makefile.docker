@@ -5,11 +5,3 @@ nginx:
 
 botanist:
 	docker build -f Dockerfile -t sproutsocial/botanist .
-
-push-all: push-botanist push-nginx
-
-push-nginx:
-	docker push sproutsocial/botanist-nginx:latest
-
-push-botanist:
-	docker push sproutsocial/botanist:latest

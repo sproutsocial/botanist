@@ -52,6 +52,8 @@ http {
          auth_ldap_servers ldapserver;
          uwsgi_pass django;
          include /etc/nginx/uwsgi_params;
+         # http://nginx.org/en/docs/http/ngx_http_uwsgi_module.html#uwsgi_read_timeout
+         uwsgi_read_timeout 60s;
       }
 
       access_log /var/log/nginx/access.log;
