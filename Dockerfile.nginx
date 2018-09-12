@@ -18,4 +18,6 @@ ADD ./etc/nginx/nginx.conf.template /etc/nginx/nginx.conf.template
 
 COPY --from=collectstatic /code/botanist-static /data/static
 
-CMD /bin/bash -c "envsubst < /etc/nginx/nginx.conf.template > /etc/nginx/nginx.conf && dockerize -stdout /var/log/nginx/access.log -stderr /var/log/nginx/error.log /usr/sbin/nginx -g 'daemon off;'"
+# enumrate env vars we allow envsubst to operate on so nginx variables
+# such as $host and $request_uri don't get replaced :)
+CMD /bin/bash -c "envsubst '\$NGINX_HOST \$NGINX_PORT \$LDAP_URL \$LDAP_BIND_DN \$LDAP_BIND_DN_PASSWD \$LDAP_GROUP_ATTRIBUTE \$LDAP_GROUP_ATTRIBUTE_IS_DN \$LDAP_REQUIRE_GROUP'< /etc/nginx/nginx.conf.template > /etc/nginx/nginx.conf && dockerize -stdout /var/log/nginx/access.log -stderr /var/log/nginx/error.log /usr/sbin/nginx -g 'daemon off;'"

@@ -28,11 +28,16 @@ http {
    }
 
    server {
-      listen 443;
+      listen 80 default_server;
+      server_name localhost;
+      return 301 https://$host$request_uri;
+   }
+
+   server {
+      listen 443 ssl default_server;
       server_name localhost;
       charset utf-8;
 
-      ssl on;
       # hardcoded cert/key paths because we assume
       # the proper certs will be mounted into the container
       # at /etc/ssl/nginx
