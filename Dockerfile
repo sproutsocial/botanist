@@ -32,4 +32,4 @@ RUN groupadd -r botanist -g 9009 && useradd -u 9009 -g 9009 --no-log-init -r -g 
 RUN chown -R botanist:botanist ${r}
 USER botanist
 
-CMD uwsgi --socket :9090 --chdir /code --wsgi-file /code/codesearch/wsgi.py --master --processes 4 --threads 2
+CMD uwsgi --socket :9090 --chdir /code --wsgi-file /code/codesearch/wsgi.py --master --processes 4 --threads 2 --buffer-size 65535
