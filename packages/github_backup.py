@@ -114,6 +114,17 @@ def get_repos(org, repo_type, access_token=None, username=None, password=None, p
 # Github API call, can authenticate via access token, or username and password
 # git cloning/pulling, can authenticate via ssh key, or username & password via https
 
+def repocsv(string):
+    """
+    >>> repocsv('org1/repo1, org2/repo2,org3/repo3 ,org4/repo4')
+    ['org1/repo1', 'org2/repo2', 'org3/repo3', 'org4/repo4']
+    """
+    try:
+        repos = [r.strip() for r in string.split(',')]
+        return set(repos)
+    except Exception as exc:
+        raise argparse.ArgumentTypeError(exc.message)
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='backup github repositories for an organization')
     subparsers = parser.add_subparsers(dest='authtype')
@@ -126,6 +137,7 @@ if __name__ == '__main__':
     ssh_parser.add_argument('-t', '--type', type=str, dest='rtype', nargs='?', default='all', choices=REPO_TYPE_CHOICES, help='repository types to backup')
     ssh_parser.add_argument('-a', '--access-token', type=str, help='personal access token or oauth access token')
     ssh_parser.add_argument('-f', '--forks', action='store_true', help='add this arg if you want to backup fork repositories also')
+    ssh_parser.add_argument('-i', '--ignore-list', type=repocsv, default=set(), help='add repos you dont want to fetch/index, e.g. --ignore-list org1/repo1,org2/repo2')
 
     # uses a username and password for fetching repositories names from
     # github's API, and uses same username and password for
@@ -140,6 +152,7 @@ if __name__ == '__main__':
     https_parser.add_argument('-u', '--username', dest='username', type=str, required=True, help='github username')
     https_parser.add_argument('-p', '--password', dest='password', type=str, required=True, help='github password or github personal access token')
     https_parser.add_argument('-f', '--forks', action='store_true', help='add this arg if you want to backup fork repositories also')
+    https_parser.add_argument('-i', '--ignore-list', type=repocsv, default=set(), help='add repos you dont want to fetch/index, e.g. --ignore-list org1/repo1,org2/repo2')
 
     args = parser.parse_args()
 
@@ -154,9 +167,14 @@ if __name__ == '__main__':
     h = Helpers(args)
 
     for repo in org_repos:
+        # skip ignored repos
+        if repo['full_name'] in args.ignore_list:
+            print 'skipping ignored repository %s' % repo['full_name']
+            continue
+
         # skip forks unless asked not to
         if not args.forks and repo['fork']:
-            print 'skipping fork repository %s' % repo['name']
+            print 'skipping fork repository %s' % repo['full_name']
             continue
 
         destdir = os.path.join(args.directory, repo['name'])
