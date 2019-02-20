@@ -108,7 +108,8 @@ cp env.template env.local
 Make sure you generate a snakeoil SSL certificate...**DO NOT USE IN PRODUCTION**
 
 ```
-$  openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout ./cert/server.key -out ./cert/server.crt
+mkdir -p ./cert/
+openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout ./cert/server.key -out ./cert/server.crt
 Generating a 2048 bit RSA private key
 .+++
 .........................................................+++
@@ -133,10 +134,10 @@ Email Address []:
 
 then start everything up!
 ```
-docker-compose -f docker-compose.yml rm -f && docker-compose -f docker-compose.yml up --build
+docker-compose stop && docker-compose rm -f && docker-compose up --build -d
 ```
 
-You can authenticate by using the `test` LDAP user who's password is `t3st`, which is created upon startup when running `docker-compose.local.yml` via the `ldapinit` container described in `Dockerfile.ldapinit`.
+You can authenticate by using the `test` LDAP user who's password is `t3st`, which is created upon startup when running `docker-compose.yml` via the `ldapinit` container described in `Dockerfile.ldapinit`.
 
 *NOTE* you can login by going to https://localhost and login as test:t3st
 
