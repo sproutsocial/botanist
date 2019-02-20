@@ -4,3 +4,4 @@ target/
 botanist-static
 env
 env.local
+./cert/*

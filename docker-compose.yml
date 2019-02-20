@@ -25,7 +25,7 @@ services:
       volumes:
          - $HOME/botanist/repos:/botanist/repos
 
-   ldap:
+   localldap:
       image: osixia/openldap
       ports:
          - 389:389
@@ -40,5 +40,5 @@ services:
          context: ./
          dockerfile: Dockerfile.ldapinit
       depends_on:
-         - ldap
-      command: dockerize -wait tcp://ldap:389 ldapadd -v -h ldap -c -x -D cn=admin,dc=example,dc=com -w admin -f /tmp/sample.ldif
+         - localldap
+      command: dockerize -wait tcp://localldap:389 -timeout 600s ldapadd -v -h localldap -c -x -D cn=admin,dc=example,dc=com -w admin -f /tmp/sample.ldif

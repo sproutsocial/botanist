@@ -98,17 +98,45 @@ Create a folder somewhere on the host or your local laptop where the code reposi
 ```
 # create location for repositories on disk
 mkdir -p $HOME/botanist/repos
+```
 
-# copy env file to env.local, and
+```# copy env file to env.local, and
 # set GH_USER, GH_ORGS, GH_PW so you can fetch code to index
 cp env.template env.local
+```
 
-# build latest version of botanist images locally
-docker-compose -f docker-compose.local.yml rm -f
-docker-compose -f docker-compose.local.yml build
+Make sure you generate a snakeoil SSL certificate...**DO NOT USE IN PRODUCTION**
 
-# run a fully working botanist locally
-docker-compose -f docker-compose.local.yml up -d
+```
+$  openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout ./cert/server.key -out ./cert/server.crt
+Generating a 2048 bit RSA private key
+.+++
+.........................................................+++
+writing new private key to './cert/server.key'
+-----
+You are about to be asked to enter information that will be incorporated
+into your certificate request.
+What you are about to enter is what is called a Distinguished Name or a DN.
+There are quite a few fields but you can leave some blank
+For some fields there will be a default value,
+If you enter '.', the field will be left blank.
+-----
+Country Name (2 letter code) []:US
+State or Province Name (full name) []:
+Locality Name (eg, city) []:
+Organization Name (eg, company) []:
+Organizational Unit Name (eg, section) []:
+Common Name (eg, fully qualified host name) []:
+Email Address []:
+
+```
+
+then start everything up!
+```
+docker-compose -f docker-compose.yml rm -f && docker-compose -f docker-compose.yml up --build
+```
+
+You can authenticate by using the `test` LDAP user who's password is `t3st`, which is created upon startup when running `docker-compose.local.yml` via the `ldapinit` container described in `Dockerfile.ldapinit`.
 
 *NOTE* you can login by going to https://localhost and login as test:t3st
 
@@ -144,10 +172,3 @@ docker run --env-file env -v $HOME/botanist/repos:/botanist/repos botanist /bota
 These must be run on the same host machine (or with access to the same persistent volume) as the fetch and index periodic jobs run on.
 
 Note: This uses nginx configured with LDAP for authentication and SSL.
-
-### Run Locally
-```
-docker-compose -f docker-compose.local.yml rm -f && docker-compose -f docker-compose.local.yml up --build
-```
-
-You can authenticate by using the `test` LDAP user who's password is `t3st`, which is created upon startup when running `docker-compose.local.yml` via the `ldapinit` container described in `Dockerfile.ldapinit`.
