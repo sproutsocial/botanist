@@ -24,8 +24,6 @@ SECRET_KEY = '(t_@2%*#-r)ia2&v-owr@5z9dg_7t45!gtommzones-k%uac%$'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-TEMPLATE_DEBUG = True
-
 ALLOWED_HOSTS = []
 
 
@@ -71,6 +69,17 @@ DATABASES = {
 
 LANGUAGE_CODE = 'en-us'
 
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [],
+        'APP_DIRS': True,
+        'OPTIONS': {
+            # ... some options here ...
+        },
+    },
+]
+
 TIME_ZONE = 'UTC'
 
 USE_I18N = True
@@ -93,7 +102,7 @@ BIN_PATH = os.getenv('BIN_PATH', '/botanist/bin/codesearch-0.01')
 
 LOGGING = {
     'version': 1,
-    # 'disable_existing_loggers': False,
+    'disable_existing_loggers': False,
     'formatters': {
         'verbose': {
             'format': '%(levelname)s %(asctime)s %(module)s %(message)s'
