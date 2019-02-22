@@ -1,4 +1,5 @@
 *.log
+*.pyc
 fabfile.py
 target/
 botanist-static
