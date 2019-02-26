@@ -1,10 +1,5 @@
-from django.conf.urls import patterns
-from django.conf.urls import url
+from django.conf.urls import url, include
 
-urlpatterns = patterns(
-    '',
-    url(r'^$', 'ui.views.index'),
-    url(r'^search/$', 'ui.views.search'),
-    url(r'^search/results.json$', 'ui.views.search_json'),
-    #url(r'^admin/', include(admin.site.urls)),
-)
+urlpatterns = [
+    url(r'', include('ui.urls')),
+]

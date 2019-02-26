@@ -1,7 +1,11 @@
 *.log
+*.pyc
 fabfile.py
 target/
 botanist-static
 env
 env.local
 ./cert/*
+webapp/.idea/*
+.idea/*
+cert/*
