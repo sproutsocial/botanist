@@ -24,7 +24,7 @@ SECRET_KEY = '(t_@2%*#-r)ia2&v-owr@5z9dg_7t45!gtommzones-k%uac%$'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['codesearcher.int.sproutsocial.com', 'localhost']
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
