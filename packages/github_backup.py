@@ -158,6 +158,7 @@ if __name__ == '__main__':
         if not args.forks and repo['fork']:
             print 'skipping fork repository %s' % repo['name']
             continue
+
         destdir = os.path.join(args.directory, repo['name'])
         if args.authtype == 'ssh':
             repo_path = repo['ssh_url']
@@ -169,11 +170,13 @@ if __name__ == '__main__':
             with chdir(destdir):
                 try:
                     h.exec_cmd('git pull origin %s' % repo['default_branch'])
+                    continue
                 except Exception as e:
-                    print 'error: %s' % e
-        else:
-            print '*** backing up %s... ***' % h.redact(repo_path)
-            try:
-                h.exec_cmd('git clone %s %s' % (repo_path, destdir))
-            except Exception as e:
-                print 'error: %s' % e
+                    print 'error: %s (repo=%s); will re-clone!' % (e, repo['name'])
+
+        # clone the repo fresh, deleting if it already existed
+        print '*** backing up %s... ***' % h.redact(repo_path)
+        try:
+            h.exec_cmd('rm -rf %s && git clone %s %s' % (destdir, repo_path, destdir))
+        except Exception as e:
+            print 'error: %s' % e
