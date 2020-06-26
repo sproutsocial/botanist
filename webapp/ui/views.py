@@ -140,6 +140,11 @@ def parse_search_results(result_text, query, case_sensitive=True, html=True):
     query_re = get_query_re(query, case_sensitive)
     lines = filter(lambda l: l != '', result_text.split('\n'))
     results, count = {}, 0
+
+    # default_git_branches is a map of repo to default branch
+    # (sproutsocial/oak => 'main')
+    default_git_branches = {}
+
     for line in lines:
         log.debug('line=%s', line)
         fields = line.split(':', 2)  # don't split on colons that are part of source code :)
@@ -155,11 +160,20 @@ def parse_search_results(result_text, query, case_sensitive=True, html=True):
 
             count += 1
 
+            if repo_type == 'git' and not default_git_branches.has_key(fully_qualified_repo_name):
+                git_dir = fullpath.split(fully_qualified_repo_name)[0] + fully_qualified_repo_name + '/.git'
+                cmd = "git --git-dir %s branch" % git_dir
+                p = Popen([cmd], stdout=PIPE, stderr=PIPE, shell=True)
+                out, err = p.communicate()
+                if p.returncode == 0:
+                    log.debug("Default Branch for %s is %s" % (fully_qualified_repo_name, out.split(' ')[1].strip()))
+                    default_git_branches[fully_qualified_repo_name] = out.split(' ')[1].strip()
+
             result = {
                 'filename': filename,
                 'lineno': long(lineno),
                 'srcline': prepare_source_line(query_re, srcline, html),
-                'deeplink': deep_link(vcs_loc, fully_qualified_repo_name, filename, repo_type, lineno),
+                'deeplink': deep_link(vcs_loc, fully_qualified_repo_name, filename, repo_type, lineno, default_git_branches.get(fully_qualified_repo_name, None)),
                 'count': count
             }
             if fully_qualified_repo_name not in results:
@@ -195,11 +209,14 @@ def get_repo_and_filepath(fully_qualified_filename):
     return vcs_loc, '%s/%s' % (orgname, reponame), rel_file_path, repo_type
 
 
-def deep_link(vcs_loc, fully_qualified_repo_name, filepath, repo_type, lineno=None):
+def deep_link(vcs_loc, fully_qualified_repo_name, filepath, repo_type, lineno=None, git_branch=None):
     if vcs_loc not in ('github', 'bitbucket'):
         raise ValueError('unknown vcs location: %s' % vcs_loc)
 
     branch = 'default' if repo_type == 'hg' else 'master'
+
+    if git_branch:
+        branch = git_branch
 
     fmt = DEEP_LINK_TEMPLATES[vcs_loc]
     lineno_suffix_fmt = LINENO_TEMPLATES[vcs_loc]

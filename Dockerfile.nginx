@@ -10,7 +10,14 @@ RUN /code/manage.py collectstatic --noinput
 FROM stantonk/nginx-ldap:1.0.1
 
 # for envsubst
-RUN apt-get update && apt-get install -y gettext
+# Note, there's some aggressive stuff we're doing here due to jessie-backports
+# being EOLed. This all links back to stantonk/nginx-ldap which should be updated
+# for a more recent Debian, some related reading:
+#  * https://unix.stackexchange.com/questions/508724/failed-to-fetch-jessie-backports-repository/508728#508728
+#  * https://unix.stackexchange.com/questions/2544/how-to-work-around-release-file-expired-problem-on-a-local-mirror
+RUN echo "deb [check-valid-until=no] http://archive.debian.org/debian jessie-backports main" > /etc/apt/sources.list.d/backports.list && \
+apt-get update -o Acquire::Check-Valid-Until=false && \
+apt-get install -y --force-yes gettext
 
 # from https://raw.githubusercontent.com/nginx/nginx/master/conf/uwsgi_params
 ADD uwsgi_params /etc/nginx/uwsgi_params
