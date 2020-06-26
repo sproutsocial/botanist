@@ -91,3 +91,8 @@ class DeepLink(TestMixin, TestCase):
         dl = deep_link(*get_repo_and_filepath(filename), lineno=42)
 
         self.assertEqual('https://github.com/org-name/repositoryname/blob/master/somedir/sourcefile.py#L42', dl)
+
+    def test_deep_link_github_with_main_branch(self):
+        filename = os.path.join(CODE_ROOT, 'github', 'org-name', 'repositoryname', 'somedir', 'sourcefile.py')
+        dl = deep_link(*get_repo_and_filepath(filename), lineno=42, git_branch='main')
+        self.assertEqual('https://github.com/org-name/repositoryname/blob/main/somedir/sourcefile.py#L42', dl)
