@@ -41,19 +41,30 @@
             {% for reponame, vcs_result_dict in results.items %}
                 {% for vcs_loc, repo_result_data in vcs_result_dict.items %}
                 <div id="{{ reponame }}_{{ vcs_loc }}">
-                    <div class="reponame">{{ reponame }} <span class="vcs_loc_text">{{ vcs_loc }}</span></div>
-                        {% for filename, matches in repo_result_data.files.items %}
-                            <div id="{{ filename }}" class="filename">
-                                <span class="filename-text">{{ filename }}</span>
-                                {% for r in matches %}
-                                    <pre><code><a href="{{ r.deeplink }}"
-                                                  target="_blank"
-                                                  title="{{ r.lineno }}"
-                                                  class="source-code-link">{{ r.lineno }}: {{ r.srcline|safe }}</a></code></pre>
-                                {% endfor %}
-                                <br>
-                            </div>
-                        {% endfor %}
+                  <div class="reponame">
+                    {{ reponame }}
+                    <span class="vcs_loc_text">
+                    {% if vcs_log == "github" %}
+                        <a href="http://github.com/{{repo_name}}">
+                          {{ vcs_loc }}
+                        </a>
+                    {% else %}
+                      {{ vcs_loc }}
+                    {% endif %}
+                    </span>
+                  </div>
+                  {% for filename, matches in repo_result_data.files.items %}
+                      <div id="{{ filename }}" class="filename">
+                          <span class="filename-text">{{ filename }}</span>
+                          {% for r in matches %}
+                              <pre><code><a href="{{ r.deeplink }}"
+                                            target="_blank"
+                                            title="{{ r.lineno }}"
+                                            class="source-code-link">{{ r.lineno }}: {{ r.srcline|safe }}</a></code></pre>
+                          {% endfor %}
+                          <br>
+                      </div>
+                  {% endfor %}
                 </div>
                 {% endfor %}
             {% endfor %}
