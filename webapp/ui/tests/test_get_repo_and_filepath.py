@@ -6,10 +6,10 @@ from mock import patch
 from ui.views import deep_link
 from ui.views import get_repo_and_filepath
 
-# git: https://bitbucket.org/sproutsocial/sprout-cassandra-storage-commons/src/master/src/main/java/com/sproutsocial/platform/storage/cassandra/config/CassContextBuilder.java?at=master&fileviewer=file-view-default#CassContextBuilder.java-30
+# git: https://bitbucket.org/sproutsocial/sprout-cassandra-storage-commons/src/main/src/main/java/com/sproutsocial/platform/storage/cassandra/config/CassContextBuilder.java?at=main&fileviewer=file-view-default#CassContextBuilder.java-30
 # hg : https://bitbucket.org/sproutsocial/facebook-polling/src/default/src/main/java/com/sproutsocial/facebook/cassandra/ColumnFamilies.java?at=default&fileviewer=file-view-default#ColumnFamilies.java-8
 
-# git: https://bitbucket.org/ sproutsocial/sprout-cassandra-storage-commons src/master  /src/main/java/com/sproutsocial/platform/storage/cassandra/config/CassContextBuilder.java ? at=master  & fileviewer=file-view-default # CassContextBuilder.java - 30
+# git: https://bitbucket.org/ sproutsocial/sprout-cassandra-storage-commons src/main  /src/main/java/com/sproutsocial/platform/storage/cassandra/config/CassContextBuilder.java ? at=main  & fileviewer=file-view-default # CassContextBuilder.java - 30
 # hg : https://bitbucket.org/ sproutsocial/facebook-polling                 src/default /src/main/java/com/sproutsocial/facebook/cassandra/ColumnFamilies.java                    ? at=default & fileviewer=file-view-default # ColumnFamilies.java     - 8
 
 FIXTURES_ROOT = os.path.join(os.path.dirname(__file__), 'fixtures')
@@ -60,7 +60,7 @@ class DeepLink(TestMixin, TestCase):
         filename = os.path.join(CODE_ROOT, 'bitbucket', 'org-name', 'git-repo-name', 'somedir', 'sourcefile.py')
         dl = deep_link(*get_repo_and_filepath(filename))
 
-        self.assertEqual('https://bitbucket.org/org-name/git-repo-name/src/master/somedir/sourcefile.py', dl)
+        self.assertEqual('https://bitbucket.org/org-name/git-repo-name/src/main/somedir/sourcefile.py', dl)
 
     def test_deep_link_bitbucket_hg(self):
         filename = os.path.join(CODE_ROOT, 'bitbucket', 'org-name', 'hg-repo-name', 'somedir', 'sourcefile.py')
@@ -72,7 +72,7 @@ class DeepLink(TestMixin, TestCase):
         filename = os.path.join(CODE_ROOT, 'bitbucket', 'org-name', 'git-repo-name', 'somedir', 'sourcefile.py')
         dl = deep_link(*get_repo_and_filepath(filename), lineno=42)
 
-        self.assertEqual('https://bitbucket.org/org-name/git-repo-name/src/master/somedir/sourcefile.py#sourcefile.py-42', dl)
+        self.assertEqual('https://bitbucket.org/org-name/git-repo-name/src/main/somedir/sourcefile.py#sourcefile.py-42', dl)
 
     def test_deep_link_bitbucket_hg_with_lineno(self):
         filename = os.path.join(CODE_ROOT, 'bitbucket', 'org-name', 'hg-repo-name', 'somedir', 'sourcefile.py')
@@ -84,13 +84,13 @@ class DeepLink(TestMixin, TestCase):
         filename = os.path.join(CODE_ROOT, 'github', 'org-name', 'repositoryname', 'somedir', 'sourcefile.py')
         dl = deep_link(*get_repo_and_filepath(filename))
 
-        self.assertEqual('https://github.com/org-name/repositoryname/blob/master/somedir/sourcefile.py', dl)
+        self.assertEqual('https://github.com/org-name/repositoryname/blob/main/somedir/sourcefile.py', dl)
 
     def test_deep_link_github_with_lineno(self):
         filename = os.path.join(CODE_ROOT, 'github', 'org-name', 'repositoryname', 'somedir', 'sourcefile.py')
         dl = deep_link(*get_repo_and_filepath(filename), lineno=42)
 
-        self.assertEqual('https://github.com/org-name/repositoryname/blob/master/somedir/sourcefile.py#L42', dl)
+        self.assertEqual('https://github.com/org-name/repositoryname/blob/main/somedir/sourcefile.py#L42', dl)
 
     def test_deep_link_github_with_main_branch(self):
         filename = os.path.join(CODE_ROOT, 'github', 'org-name', 'repositoryname', 'somedir', 'sourcefile.py')
