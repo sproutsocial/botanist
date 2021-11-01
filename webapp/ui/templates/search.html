@@ -28,9 +28,7 @@
         <div class="left-nav">
             {% for reponame, vcs_result_dict in results.items %}
                 {% for vcs_loc, repo_result_data in vcs_result_dict.items %}
-                    {% if vcs_loc == "bitbucket" %}
-                        <img src="{% static 'bitbucket.favicon.ico' %}" class="vcs_loc"/>
-                    {% elif vcs_loc == "github" %}
+                    {% if vcs_loc == "github" %}
                         <img src="{% static 'github.favicon.ico' %}" class="vcs_loc"/>
                     {% endif %}
                     <a href="#{{ reponame }}_{{ vcs_loc }}" class="reponame-nav">{{ reponame }}</a><br>

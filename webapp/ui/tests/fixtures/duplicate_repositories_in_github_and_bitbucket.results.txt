@@ -1,2 +1,0 @@
-/botanist/repos/bitbucket/org1/sproutjobs/src/main/java/com/sproutsocial/AbstractJob.java:27:public abstract class AbstractJob implements Job {
-/botanist/repos/github/org1/sproutjobs/src/main/java/com/sproutsocial/AbstractJob.java:27:public abstract class AbstractJob implements Job {

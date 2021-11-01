@@ -22,11 +22,9 @@ from ui.util import get_repo_type
 
 HIGHLIGHT_QUERY_TEMPLATE = r'<span class="highlighted-search-query">\1</span>'
 DEEP_LINK_TEMPLATES = {
-    'bitbucket': 'https://bitbucket.org/%(fully_qualified_repo_name)s/src/%(branch)s/%(fpath)s',
     'github': 'https://github.com/%(fully_qualified_repo_name)s/blob/%(branch)s/%(fpath)s',
 }
 LINENO_TEMPLATES = {
-    'bitbucket': '%s-%s',
     'github': 'L%s',
 }
 
@@ -191,7 +189,7 @@ def parse_search_results(result_text, query, case_sensitive=True, html=True):
             log.error('ValueError: %s (cause: %s)', fields, e)
 
     # sort results -- have to because the lines are sorted lexicographically
-    # but within each repository source site (bitbucket, github) due to
+    # but within each repository source site (github) due to
     # CODE_ROOT directory structure layout. we want it to be sorted
     # lexicographically across all repository sources
     results = OrderedDict((k, results[k]) for k in sorted(results.keys()))
@@ -210,18 +208,17 @@ def get_repo_and_filepath(fully_qualified_filename):
 
 
 def deep_link(vcs_loc, fully_qualified_repo_name, filepath, repo_type, lineno=None, git_branch=None):
-    if vcs_loc not in ('github', 'bitbucket'):
+    if vcs_loc not in ('github'):
         raise ValueError('unknown vcs location: %s' % vcs_loc)
 
-    branch = 'default' if repo_type == 'hg' else 'master'
+    branch = 'main'
 
     if git_branch:
         branch = git_branch
 
     fmt = DEEP_LINK_TEMPLATES[vcs_loc]
     lineno_suffix_fmt = LINENO_TEMPLATES[vcs_loc]
-    src_file = path.split(filepath)[-1]
-    lineno_suffix_args = (src_file, lineno) if vcs_loc == 'bitbucket' else (lineno,)
+    lineno_suffix_args = (lineno,)
 
     args = {'fully_qualified_repo_name': fully_qualified_repo_name, 'fpath': filepath, 'branch': branch}
     link = fmt % args
