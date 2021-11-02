@@ -22,7 +22,7 @@ class ParseSearchResults(TestCase):
 
         self.assertEqual(4, count)
         self.assertEqual(2, len(results['org1/repo1']['github']['files']))
-        self.assertEqual('https://github.com/org1/repo1/blob/master/src/main/java/com/sproutsocial/SomeClass.java#L148',
+        self.assertEqual('https://github.com/org1/repo1/blob/main/src/main/java/com/sproutsocial/SomeClass.java#L148',
                          results['org1/repo1']['github']['files']['src/main/java/com/sproutsocial/SomeClass.java'][0]['deeplink'])
         self.assertEqual(1, len(results['org2/repo1']['github']['files']))
         self.assertEqual(1, len(results['org2/repo2']['github']['files']))
