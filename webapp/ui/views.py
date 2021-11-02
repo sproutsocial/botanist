@@ -213,7 +213,7 @@ def deep_link(vcs_loc, fully_qualified_repo_name, filepath, repo_type, lineno=No
     if vcs_loc not in ('github', 'bitbucket'):
         raise ValueError('unknown vcs location: %s' % vcs_loc)
 
-    branch = 'default' if repo_type == 'hg' else 'master'
+    branch = 'default' if repo_type == 'hg' else 'main'
 
     if git_branch:
         branch = git_branch
