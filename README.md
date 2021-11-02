@@ -86,6 +86,8 @@ finished cleaning up the additions I made recently.
 wrote up something to do this in Python based on
 https://github.com/celeen/gitter
 
+default github branch name is "main".
+
 ## pull requests welcome!
 
 # docker instructions
