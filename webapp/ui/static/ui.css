@@ -181,3 +181,19 @@ img.vcs_loc {
     font-size: 8pt;
     color: red;
 }
+
+.deprecation-notice {
+    width: 450px;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+    line-height: 1.15;
+    border: 1px solid rgb(43, 135, 211);
+    background-color: rgb(220, 242, 255);
+    border-radius: 8px;
+    padding: 8px 12px;
+    margin: 0 auto 24px;
+}
+
+.deprecation-notice a {
+    color: inherit;
+    font-weight: bold;
+}
