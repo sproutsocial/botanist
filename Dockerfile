@@ -1,10 +1,21 @@
-FROM python:2.7.14
+# syntax=docker/dockerfile:1-labs
+# using labs to get ADD git repo support
+FROM golang:1.20 AS codesearch
+
+ADD https://github.com/google/codesearch.git#v1.2.0 /codesearch
+WORKDIR /codesearch
+RUN go build ./cmd/cgrep
+RUN go build ./cmd/cindex
+RUN go build ./cmd/csearch
+
+FROM python:3.11-slim
 
 ENV r=/botanist
 
 RUN apt-get update && apt-get install -y \
     git \
     mercurial \
+    uwsgi-plugin-python3 \
     && rm -rf /var/lib/apt/lists/*
 
 RUN mkdir -p \
@@ -16,7 +27,7 @@ RUN mkdir -p \
 
 ENV CSEARCHINDEX=${r}/repos/.index
 
-ADD packages/codesearch-0.01-linux-amd64.tgz ${r}/bin
+COPY --link --from=codesearch /codesearch/cgrep /codesearch/cindex /codesearch/csearch ${r}/bin/
 ADD packages/bitbucket-backup.tgz ${r}/bin
 ADD packages/github_backup.py ${r}/bin
 ADD cron/index.sh ${r}/bin/index.sh
@@ -28,7 +39,8 @@ ADD ./webapp /code
 
 VOLUME ${r}/repos
 
-RUN groupadd -r botanist -g 9009 && useradd -u 9009 -g 9009 --no-log-init -r -g botanist botanist
+ARG BOTANIST_UID=9009
+RUN groupadd -r botanist -g ${BOTANIST_UID} && useradd -u ${BOTANIST_UID} -g ${BOTANIST_UID} --no-log-init -r -g botanist botanist
 RUN chown -R botanist:botanist ${r}
 USER botanist
 

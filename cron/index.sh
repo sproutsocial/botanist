@@ -24,7 +24,7 @@ if ( set -o noclobber; echo "$$" > "$lockfile") 2> /dev/null; then
     cd $REPOS
 
     # index everything at once or else index can get borked
-    $BIN/codesearch-0.01/cindex $REPOS
+    $BIN/cindex $REPOS
 
     log "Finished."
     # clean up after yourself, and release your trap
@@ -33,4 +33,3 @@ if ( set -o noclobber; echo "$$" > "$lockfile") 2> /dev/null; then
 else
     log "Lock Exists: $lockfile owned by $(cat $lockfile)"
 fi
-
