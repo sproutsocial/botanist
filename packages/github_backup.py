@@ -7,12 +7,10 @@ import base64
 import contextlib
 import json
 import os
-import sys
-import urllib2
 
 from collections import namedtuple
-from urllib import urlencode
-from urllib import quote
+from urllib.parse import quote, urlencode
+from urllib.request import Request, urlopen
 
 
 API_BASE = 'https://api.github.com/'
@@ -38,7 +36,7 @@ class Helpers(object):
         """
         Executes an external command taking into account errors and logging.
         """
-        print "Executing command: %s" % self.redact(command)
+        print("Executing command: %s" % self.redact(command))
         resp = os.system(command)
         if resp != 0:
             raise Exception(self.redact("Command [%s] failed (%s)" % (command, resp)))
@@ -78,19 +76,19 @@ def get_repos(org, repo_type, access_token=None, username=None, password=None, p
     if access_token:
         qs_params.update({'access_token': args.access_token})
         url += urlencode(qs_params)
-        request = urllib2.Request(url)
+        request =Request(url)
     elif username and password:
         url += urlencode(qs_params)
-        request = urllib2.Request(url)
+        request = Request(url)
         add_https_basic_auth(request, username, password)
     else:
         raise ValueError('unworkable combination of authentication inputs')
 
-    response = urllib2.urlopen(request)
+    response = urlopen(request)
     try:
         pagination = get_pagination(response.headers['Link'])
     except KeyError:
-        print 'no Link header, nothing to paginate through.'
+        print('no Link header, nothing to paginate through.')
         pagination = Pagination(None, None, None, None)
 
     repos = json.loads(response.read())
@@ -100,10 +98,10 @@ def get_repos(org, repo_type, access_token=None, username=None, password=None, p
 
     # so, this isn't the DRYest code ;-)
     while pagination.next:
-        request = urllib2.Request(pagination.next)
+        request = Request(pagination.next)
         if username and password:
             add_https_basic_auth(request, username, password)
-        response = urllib2.urlopen(request)
+        response = urlopen(request)
         pagination = get_pagination(response.headers['Link'])
         repos = json.loads(response.read())
         for r in repos:
@@ -169,12 +167,12 @@ if __name__ == '__main__':
     for repo in org_repos:
         # skip ignored repos
         if repo['full_name'] in args.ignore_list:
-            print 'skipping ignored repository %s' % repo['full_name']
+            print('skipping ignored repository %s' % repo['full_name'])
             continue
 
         # skip forks unless asked not to
         if not args.forks and repo['fork']:
-            print 'skipping fork repository %s' % repo['full_name']
+            print('skipping fork repository %s' % repo['full_name'])
             continue
 
         destdir = os.path.join(args.directory, repo['name'])
@@ -184,17 +182,17 @@ if __name__ == '__main__':
             repo_path = h.https_url_with_auth(repo['clone_url'])
         if os.path.exists(destdir):
             # pull in new commits to an already tracked repository
-            print '*** updating %s... ***' % h.redact(repo_path)
+            print('*** updating %s... ***' % h.redact(repo_path))
             with chdir(destdir):
                 try:
                     h.exec_cmd('git pull origin %s' % repo['default_branch'])
                     continue
                 except Exception as e:
-                    print 'error: %s (repo=%s); will re-clone!' % (e, repo['name'])
+                    print('error: %s (repo=%s); will re-clone!' % (e, repo['name']))
 
         # clone the repo fresh, deleting if it already existed
-        print '*** backing up %s... ***' % h.redact(repo_path)
+        print('*** backing up %s... ***' % h.redact(repo_path))
         try:
             h.exec_cmd('rm -rf %s && git clone %s %s' % (destdir, repo_path, destdir))
         except Exception as e:
-            print 'error: %s' % e
+            print('error: %s' % e)
