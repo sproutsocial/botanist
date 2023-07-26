@@ -76,7 +76,7 @@ def get_repos(org, repo_type, access_token=None, username=None, password=None, p
     if access_token:
         qs_params.update({'access_token': args.access_token})
         url += urlencode(qs_params)
-        request =Request(url)
+        request = Request(url)
     elif username and password:
         url += urlencode(qs_params)
         request = Request(url)
