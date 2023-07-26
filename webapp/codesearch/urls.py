@@ -1,5 +1,5 @@
-from django.conf.urls import url, include
+from django.urls import path, include
 
 urlpatterns = [
-    url(r'', include('ui.urls')),
+    path("", include("ui.urls")),
 ]

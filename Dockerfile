@@ -1,4 +1,11 @@
-FROM python:2.7.14
+FROM python:3.8-slim AS exporter
+
+RUN pip install poetry
+ADD . /repo
+WORKDIR /repo
+RUN poetry export --with=docker --output=requirements.txt
+
+FROM python:3.8-slim
 
 ENV r=/botanist
 
@@ -22,7 +29,7 @@ ADD packages/github_backup.py ${r}/bin
 ADD cron/index.sh ${r}/bin/index.sh
 ADD cron/fetch-code.sh ${r}/bin/fetch-code.sh
 
-ADD webapp/requirements.txt /tmp
+COPY --from=exporter /repo/requirements.txt /tmp
 RUN pip install -r /tmp/requirements.txt
 ADD ./webapp /code
 
