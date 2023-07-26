@@ -9,7 +9,6 @@ readme = "README.md"
 [tool.poetry.dependencies]
 python = "^3.8"
 Django = "~4.2.3"
-requests = "~2.31.0"
 
 [tool.poetry.group.docker.dependencies]
 uWSGI = "~2.0.21"
