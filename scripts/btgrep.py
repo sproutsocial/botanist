@@ -5,10 +5,13 @@ import json
 import sys
 import urllib
 import urllib2
+import base64
 
-# You need to fill in the domain of where you install
-# Botanist for this to work, obviously :)
-BOTANIST_DOMAIN = 'http://example.com'
+BOTANIST_DOMAIN = 'https://codesearcher.int.sproutsocial.com/'
+# NOTE: Fill out with real username/password to test.
+# (Or come up with a real solution like sticking an auth-less version behind SDM)
+LDAP_USERNAME = ''
+LDAP_PASSWORD = ''
 
 
 def get_vcs_prefix(vcs_loc):
@@ -27,8 +30,12 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     params = urllib.urlencode({'q': args.PATTERN, 'case': 'insensitive' if args.ignore_case else 'sensitive'})
-    r = urllib2.urlopen(BOTANIST_DOMAIN + '/search/results.json?' + params).read()
-    data = json.loads(r).get('data', {}).get('results', {})
+    req = urllib2.Request(BOTANIST_DOMAIN + '/search/results.json?' + params)
+    req.add_header('Authorization', 'Basic {0}'.format(
+        base64.encodestring('{0}:{1}'.format(
+            LDAP_USERNAME, LDAP_PASSWORD))[:-1]))
+    resp = urllib2.urlopen(req).read()
+    data = json.loads(resp).get('data', {}).get('results', {})
 
     if data is None:
         print 'no results found.'
