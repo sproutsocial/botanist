@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 """
 Backup all your organization's repositories, private or otherwise.
 """
@@ -61,9 +61,9 @@ def get_pagination(raw_link_header):
     return Pagination(*(link_map.get(f) for f in Pagination._fields))
 
 
-def add_https_basic_auth(request, username, password):
-    base64string = base64.encodestring('%s:%s' % (username, password)).replace('\n', '')
-    request.add_header("Authorization", "Basic %s" % base64string)
+def add_https_basic_auth(request: Request, username, password):
+    base64string = base64.b64encode(f'{username}:{password}'.encode('utf-8'))
+    request.add_header("Authorization", "Basic %s" % base64string.decode('utf-8'))
 
 
 def get_repos(org, repo_type, access_token=None, username=None, password=None, per_page=25):
@@ -87,6 +87,7 @@ def get_repos(org, repo_type, access_token=None, username=None, password=None, p
     response = urlopen(request)
     try:
         pagination = get_pagination(response.headers['Link'])
+        print(repr(pagination))
     except KeyError:
         print('no Link header, nothing to paginate through.')
         pagination = Pagination(None, None, None, None)
@@ -103,6 +104,7 @@ def get_repos(org, repo_type, access_token=None, username=None, password=None, p
             add_https_basic_auth(request, username, password)
         response = urlopen(request)
         pagination = get_pagination(response.headers['Link'])
+        print(repr(pagination))
         repos = json.loads(response.read())
         for r in repos:
             if not r.get('archived'):

@@ -89,11 +89,10 @@ def search_json(request):
 
 
 def render_json(data, status_code=200):
-    return HttpResponse(json.dumps({'data': data}), content_type="application/json", status_code=status_code)
+    return HttpResponse(json.dumps({'data': data}), content_type="application/json", status=status_code)
 
-###### to be refactored
 
-def do_search(query, case_sensitive=True):
+def do_search(query: str, case_sensitive=True) -> str:
     # this is extremely important security code here, this
     # prevents shell code injection
     safe_query = pipes.quote(query)
@@ -103,7 +102,7 @@ def do_search(query, case_sensitive=True):
     cmd = '%s -n %s %s' % (executable, case_arg, safe_query)
     log.info('cmd = %s', cmd)
 
-    p = Popen([cmd], stdout=PIPE, stderr=PIPE, shell=True)
+    p = Popen([cmd], stdout=PIPE, stderr=PIPE, shell=True, encoding='utf-8')
     out, err = p.communicate()
     log.info('csearch return code = %d', p.returncode)
     if p.returncode > 1: # not zero, see the source for csearch
@@ -136,7 +135,7 @@ def get_query_re(query, case_sensitive=True):
         raise RegexError(e)
 
 
-def parse_search_results(result_text, query, case_sensitive=True, html=True):
+def parse_search_results(result_text: str, query: str, case_sensitive=True, html=True):
     query_re = get_query_re(query, case_sensitive)
     lines = filter(lambda l: l != '', result_text.split('\n'))
     results, count = {}, 0
@@ -163,7 +162,7 @@ def parse_search_results(result_text, query, case_sensitive=True, html=True):
             if repo_type == 'git' and fully_qualified_repo_name not in default_git_branches:
                 git_dir = fullpath.split(fully_qualified_repo_name)[0] + fully_qualified_repo_name + '/.git'
                 cmd = "git --git-dir %s branch" % git_dir
-                p = Popen([cmd], stdout=PIPE, stderr=PIPE, shell=True)
+                p = Popen([cmd], stdout=PIPE, stderr=PIPE, shell=True, encoding='utf-8')
                 out, err = p.communicate()
                 if p.returncode == 0:
                     log.debug("Default Branch for %s is %s" % (fully_qualified_repo_name, out.split(' ')[1].strip()))
