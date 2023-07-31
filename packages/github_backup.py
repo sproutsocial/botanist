@@ -87,7 +87,6 @@ def get_repos(org, repo_type, access_token=None, username=None, password=None, p
     response = urlopen(request)
     try:
         pagination = get_pagination(response.headers['Link'])
-        print(repr(pagination))
     except KeyError:
         print('no Link header, nothing to paginate through.')
         pagination = Pagination(None, None, None, None)
@@ -104,7 +103,6 @@ def get_repos(org, repo_type, access_token=None, username=None, password=None, p
             add_https_basic_auth(request, username, password)
         response = urlopen(request)
         pagination = get_pagination(response.headers['Link'])
-        print(repr(pagination))
         repos = json.loads(response.read())
         for r in repos:
             if not r.get('archived'):
