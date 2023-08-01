@@ -17,7 +17,7 @@ class PrepareSourceLine(TestCase):
     def test_regex_query_match_is_highlighted_but_as_original_matched_text(self):
         query = r'v1\/'
         source_line = r'			URLLocation="https://example.com/v1/"'
-        expected = u'\t\t\tURLLocation=&quot;https://example.com/<span class="highlighted-search-query">v1/</span>&quot;'
+        expected = '\t\t\tURLLocation=&quot;https://example.com/<span class="highlighted-search-query">v1/</span>&quot;'
 
         query_re = get_query_re(query)
         result = prepare_source_line(query_re, source_line)

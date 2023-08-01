@@ -1,10 +1,9 @@
-from django.conf.urls import url
+from django.urls import path
 
-import views
+from . import views
 
 urlpatterns = [
-    url(r'^$', views.index),
-    url(r'^search/$', views.search),
-    url(r'^search/results.json$', views.search_json),
-    #url(r'^admin/', include(admin.site.urls)),
+    path("", views.index),
+    path("search/", views.search),
+    path("search/results.json", views.search_json),
 ]

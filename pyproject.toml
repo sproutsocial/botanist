@@ -1,0 +1,21 @@
+[tool.poetry]
+name = "botanist"
+version = "1.0.0"
+description = "Fast web and command-line code search tool for companies and teams who use github and/or bitbucket."
+authors = ["Your Name <you@example.com>"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+Django = "~4.2.3"
+
+[tool.poetry.group.dev.dependencies]
+black = "^23.7.0"
+
+[tool.black]
+line-length = 120
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

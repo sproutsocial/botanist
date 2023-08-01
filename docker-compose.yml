@@ -8,37 +8,15 @@ services:
       env_file:
         - ./env.local
       ports:
-         - 80:80
-         - 443:443
-      volumes:
-         # IMPORTANT: do not use these snake-oil certs in production!
-         - ./cert:/etc/ssl/nginx
+         - "8080:8080"
 
    webapp:
       build:
          context: ./
          dockerfile: Dockerfile
       ports:
-         - 9090
+         - "9090:9090"
       env_file:
          - ./env.local
       volumes:
          - $HOME/botanist/repos:/botanist/repos
-
-   localldap:
-      image: osixia/openldap
-      ports:
-         - 389:389
-      environment:
-         - LDAP_DOMAIN=example.com
-         - LDAP_ORGANISATION="Example Ltd."
-
-   # this runs to add a test user to the ldap docker container and then exits
-   # you can log in with username: test and password: t3st
-   ldapinit:
-      build:
-         context: ./
-         dockerfile: Dockerfile.ldapinit
-      depends_on:
-         - localldap
-      command: dockerize -wait tcp://localldap:389 -timeout 600s ldapadd -v -h localldap -c -x -D cn=admin,dc=example,dc=com -w admin -f /tmp/sample.ldif

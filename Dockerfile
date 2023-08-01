@@ -1,10 +1,21 @@
-FROM python:2.7.14
+FROM python:3.11-slim AS exporter
+
+RUN pip install poetry
+COPY pyproject.toml poetry.lock /tmp/
+RUN poetry export -C /tmp --output=/tmp/requirements.txt
+
+FROM debian:bookworm
 
 ENV r=/botanist
 
-RUN apt-get update && apt-get install -y \
+RUN apt-get update && apt-get install -y --no-install-recommends \
     git \
     mercurial \
+    python3-pip \
+    python3-virtualenv \
+    python3.11-venv \
+    uwsgi \
+    uwsgi-plugin-python3 \
     && rm -rf /var/lib/apt/lists/*
 
 RUN mkdir -p \
@@ -22,8 +33,9 @@ ADD packages/github_backup.py ${r}/bin
 ADD cron/index.sh ${r}/bin/index.sh
 ADD cron/fetch-code.sh ${r}/bin/fetch-code.sh
 
-ADD webapp/requirements.txt /tmp
-RUN pip install -r /tmp/requirements.txt
+COPY --from=exporter /tmp/requirements.txt /tmp
+RUN python3 -m venv /venv \
+    && /venv/bin/pip install --no-deps --compile -r /tmp/requirements.txt
 ADD ./webapp /code
 
 VOLUME ${r}/repos
@@ -32,4 +44,4 @@ RUN groupadd -r botanist -g 9009 && useradd -u 9009 -g 9009 --no-log-init -r -g 
 RUN chown -R botanist:botanist ${r}
 USER botanist
 
-CMD uwsgi --socket :9090 --chdir /code --wsgi-file /code/codesearch/wsgi.py --master --processes 4 --threads 2 --buffer-size 65535
+CMD uwsgi --socket :9090 --chdir /code --plugin python311 --virtualenv /venv --wsgi-file /code/codesearch/wsgi.py --master --processes 4 --threads 2 --buffer-size 65535

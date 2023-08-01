@@ -1,7 +1,7 @@
 import os
 
 from django.test import TestCase
-from mock import patch
+from unittest.mock import patch
 from unittest import skip
 
 from ui.views import deep_link
