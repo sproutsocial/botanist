@@ -6,7 +6,9 @@ import argparse
 import base64
 import contextlib
 import json
+import logging
 import os
+import subprocess
 
 from collections import namedtuple
 from urllib.parse import quote, urlencode
@@ -36,10 +38,19 @@ class Helpers(object):
         """
         Executes an external command taking into account errors and logging.
         """
-        print("Executing command: %s" % self.redact(command))
-        resp = os.system(command)
-        if resp != 0:
-            raise Exception(self.redact("Command [%s] failed (%s)" % (command, resp)))
+        logging.info("Executing command: %s" % self.redact(command))
+        try:
+            command_output = subprocess.check_output(command, stderr=subprocess.STDOUT, shell=True, encoding='UTF-8')
+            logging.debug("Output of command: \n%s", self.redact(command_output))
+        except subprocess.CalledProcessError as e:
+            logging.warning("Output of failed command: \n%s", self.redact(e.output))
+            if e.returncode < 0:
+                msg = f"Child was terminated by signal {-e.returncode}"
+            else:
+                msg = f"Child returned {e.returncode}"
+            raise Exception(self.redact("Command [%s] failed: %s" % (command, msg)))
+        except OSError as e:
+            raise Exception(self.redact("Command [%s] failed: %s" % (command, e)))
 
     def https_url_with_auth(self, base_url):
         _, suffix = base_url.split('https://')
@@ -88,7 +99,7 @@ def get_repos(org, repo_type, access_token=None, username=None, password=None, p
     try:
         pagination = get_pagination(response.headers['Link'])
     except KeyError:
-        print('no Link header, nothing to paginate through.')
+        logging.debug('no Link header, nothing to paginate through.')
         pagination = Pagination(None, None, None, None)
 
     repos = json.loads(response.read())
@@ -123,7 +134,9 @@ def repocsv(string):
     except Exception as exc:
         raise argparse.ArgumentTypeError(exc.message)
 
+
 if __name__ == '__main__':
+    logging.basicConfig(level=os.environ.get('LOG_LEVEL', 'INFO'))
     parser = argparse.ArgumentParser(description='backup github repositories for an organization')
     subparsers = parser.add_subparsers(dest='authtype')
 
@@ -167,12 +180,12 @@ if __name__ == '__main__':
     for repo in org_repos:
         # skip ignored repos
         if repo['full_name'] in args.ignore_list:
-            print('skipping ignored repository %s' % repo['full_name'])
+            logging.info('skipping ignored repository %s' % repo['full_name'])
             continue
 
         # skip forks unless asked not to
         if not args.forks and repo['fork']:
-            print('skipping fork repository %s' % repo['full_name'])
+            logging.info('skipping fork repository %s' % repo['full_name'])
             continue
 
         destdir = os.path.join(args.directory, repo['name'])
@@ -182,17 +195,17 @@ if __name__ == '__main__':
             repo_path = h.https_url_with_auth(repo['clone_url'])
         if os.path.exists(destdir):
             # pull in new commits to an already tracked repository
-            print('*** updating %s... ***' % h.redact(repo_path))
+            logging.info('*** updating %s... ***' % h.redact(repo_path))
             with chdir(destdir):
                 try:
                     h.exec_cmd('git pull origin %s' % repo['default_branch'])
                     continue
                 except Exception as e:
-                    print('error: %s (repo=%s); will re-clone!' % (e, repo['name']))
+                    logging.warning('error: %s (repo=%s); will re-clone!' % (e, repo['name']))
 
         # clone the repo fresh, deleting if it already existed
-        print('*** backing up %s... ***' % h.redact(repo_path))
+        logging.info('*** backing up %s... ***' % h.redact(repo_path))
         try:
             h.exec_cmd('rm -rf %s && git clone %s %s' % (destdir, repo_path, destdir))
         except Exception as e:
-            print('error: %s' % e)
+            logging.error('error: %s' % e)
