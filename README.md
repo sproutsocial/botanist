@@ -1,6 +1,22 @@
 # botanist
 a web and command-line code search tool for teams.
 
+Provides the service behind [codesearcher](https://codesearcher.int.sproutsocial.com/)
+
+## Updates and Deploys
+
+### Updates
+
+Updates to this repo will trigger a [jenkins job](https://build.int.sproutsocial.com/job/sproutsocial/job/botanist/) to build, scan, and push the image to [ECR](https://us-east-1.console.aws.amazon.com/ecr/repositories/private/412335208158/botanist?region=us-east-1).
+
+### Deploys
+
+The image launched on the codesearcher instance is managed by [infra_chef](https://github.com/sproutsocial/infra_chef/tree/main).
+
+Once a new image is uploaded, to deploy it requires an infra_chef PR to update the [botanist_version attribute](https://github.com/sproutsocial/infra_chef/blob/main/cookbooks/sprout_codesearcher/attributes/default.rb#L11)
+
+(Don't forget to also bump the cookbook version in `metadata.rb` and update `CHANGELOG`)
+
 ## Web search
 ![botanist-search-main](docs/botanist-search-main.png)
 
