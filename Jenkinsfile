@@ -27,9 +27,6 @@ pipeline {
               sh "docker build --tag ${IMAGE_URI}:${env.BRANCH_NAME} --tag ${IMAGE_URI}:${GIT_HASH} --tag ${IMAGE_URI}:latest ."
             }
           }
-          if (env.BRANCH_NAME != 'main') {
-            sproutDocker.submitImageScan(IMAGE_URI, "${GIT_REPO}", env.CHANGE_ID,  "${SERVICE}", env.GIT_COMMIT)
-          }
         }
       }
     }
