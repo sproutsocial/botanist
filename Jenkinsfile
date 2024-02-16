@@ -46,7 +46,7 @@ pipeline {
           String imageTag = (env.BRANCH_NAME == 'main') ? 'latest' : GIT_HASH;
 
           // Run image security on built image
-          sproutImageSecurity.runImageSecurity("infrastructure", "${IMAGE_URI}", imageTag)
+          sproutImageSecurity.runImageSecurity("infrastructure", ["${IMAGE_URI}:${imageTag}"])
         }
       }
     }
