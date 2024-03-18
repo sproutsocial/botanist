@@ -8,7 +8,7 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.11"
-Django = "~4.2.7"
+Django = "~4.2.11"
 
 [tool.poetry.group.dev.dependencies]
 black = "^23.7.0"
