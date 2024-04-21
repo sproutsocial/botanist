@@ -1,5 +1,6 @@
 all: nginx botanist
 
+
 nginx:
 	docker build -f Dockerfile.nginx -t sproutsocial/botanist-nginx .
 
