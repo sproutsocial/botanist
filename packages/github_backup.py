@@ -1,7 +1,11 @@
-#!/usr/bin/env python3
+#!/venv/bin/python3
 """
 Backup all your organization's repositories, private or otherwise.
 """
+
+import sentry_sdk
+sentry_sdk.init()
+
 import argparse
 import base64
 import contextlib
@@ -10,6 +14,7 @@ import logging
 import os
 import subprocess
 
+from datadog import initialize, statsd
 from collections import namedtuple
 from urllib.parse import quote, urlencode
 from urllib.request import Request, urlopen
@@ -18,6 +23,7 @@ from urllib.request import Request, urlopen
 API_BASE = 'https://api.github.com/'
 REPO_TYPE_CHOICES = ('all', 'public', 'private', 'forks', 'sources', 'member')
 
+initialize()
 
 @contextlib.contextmanager
 def chdir(dirname=None):
@@ -105,6 +111,7 @@ def get_repos(org, repo_type, access_token=None, username=None, password=None, p
     repos = json.loads(response.read())
     for r in repos:
         if not r.get('archived'):
+            logging.info('skipping archived repository %s' % r['full_name'])
             yield r
 
     # so, this isn't the DRYest code ;-)
@@ -117,6 +124,7 @@ def get_repos(org, repo_type, access_token=None, username=None, password=None, p
         repos = json.loads(response.read())
         for r in repos:
             if not r.get('archived'):
+                logging.info('skipping archived repository %s' % r['full_name'])
                 yield r
 
 
@@ -199,6 +207,7 @@ if __name__ == '__main__':
             with chdir(destdir):
                 try:
                     h.exec_cmd('git pull origin %s' % repo['default_branch'])
+                    statsd.increment('spt.codesearcher.git.backups', tags=[f"repo:{repo['name']}", f"branch:{repo['default_branch']}"])
                     continue
                 except Exception as e:
                     logging.warning('error: %s (repo=%s); will re-clone!' % (e, repo['name']))
@@ -207,5 +216,6 @@ if __name__ == '__main__':
         logging.info('*** backing up %s... ***' % h.redact(repo_path))
         try:
             h.exec_cmd('rm -rf %s && git clone %s %s' % (destdir, repo_path, destdir))
+            statsd.increment('spt.codesearcher.git.backups', tags=[f"repo:{repo['name']}", f"branch:{repo['default_branch']}"])
         except Exception as e:
             logging.error('error: %s' % e)
