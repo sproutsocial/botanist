@@ -111,8 +111,9 @@ def get_repos(org, repo_type, access_token=None, username=None, password=None, p
     repos = json.loads(response.read())
     for r in repos:
         if not r.get('archived'):
-            logging.info('skipping archived repository %s' % r['full_name'])
             yield r
+        else:
+            logging.info(f'skipping archived repository {r["full_name"]}')
 
     # so, this isn't the DRYest code ;-)
     while pagination.next:
@@ -124,8 +125,9 @@ def get_repos(org, repo_type, access_token=None, username=None, password=None, p
         repos = json.loads(response.read())
         for r in repos:
             if not r.get('archived'):
-                logging.info('skipping archived repository %s' % r['full_name'])
                 yield r
+            else:
+                logging.info(f'skipping archived repository {r["full_name"]}')
 
 
 # Github API call, can authenticate via access token, or username and password
@@ -210,12 +212,16 @@ if __name__ == '__main__':
                     statsd.increment('spt.codesearcher.git.backups', tags=[f"repo:{repo['name']}", f"branch:{repo['default_branch']}"])
                     continue
                 except Exception as e:
-                    logging.warning('error: %s (repo=%s); will re-clone!' % (e, repo['name']))
+                    logging.warning(f'error pulling {repo["name"]}, will re-clone: {e}')
 
-        # clone the repo fresh, deleting if it already existed
-        logging.info('*** backing up %s... ***' % h.redact(repo_path))
+        # either there is no backup of this repo yet, or the git pull failed so we want to attempt a fresh clone
+        logging.info('*** full clone of %s... ***' % h.redact(repo_path))
         try:
-            h.exec_cmd('rm -rf %s && git clone %s %s' % (destdir, repo_path, destdir))
+            # Clone into a temporary path just in case the clone fails for ephemeral reasons, such as a github outage
+            # This way we don't blow away the existing backup if there is one and pull may work again later
+            h.exec_cmd(f'rm -rf {destdir}.tmp && git clone {repo_path} {destdir}.tmp && rm -rf {destdir} && mv {destdir}.tmp {destdir}')
             statsd.increment('spt.codesearcher.git.backups', tags=[f"repo:{repo['name']}", f"branch:{repo['default_branch']}"])
         except Exception as e:
-            logging.error('error: %s' % e)
+            logging.error(f'error doing full clone of {repo["name"]}: {e}')
+            # Clean up the tempdir if it got left behind
+            h.exec_cmd(f'rm -rf {destdir}.tmp')
