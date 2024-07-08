@@ -102,11 +102,16 @@ def get_repos(org, repo_type, access_token=None, username=None, password=None, p
         raise ValueError('unworkable combination of authentication inputs')
 
     response = urlopen(request)
-    try:
-        pagination = get_pagination(response.headers['Link'])
-    except KeyError:
+    # response.headers is an instance of http.client.HTTPMessage, which returns `None`
+    # for missing keys. Refer to email.message.Message.__getitem__ (currently at
+    # https://github.com/python/cpython/blob/3.11/Lib/email/message.py#L410-L419)
+    # for the specific implementation.
+    raw_link_header = response.headers['Link']
+    if raw_link_header is None:
         logging.debug('no Link header, nothing to paginate through.')
         pagination = Pagination(None, None, None, None)
+    else:
+        pagination = get_pagination(raw_link_header)
 
     repos = json.loads(response.read())
     for r in repos:
