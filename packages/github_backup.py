@@ -102,7 +102,9 @@ def get_repos(org, repo_type, access_token=None, username=None, password=None, p
         raise ValueError('unworkable combination of authentication inputs')
 
     response = urlopen(request)
-    raw_link_header = response.headers.get('Link')
+    # response.headers is an instance of http.client.HTTPMessage,
+    # which returns `None` for missing keys
+    raw_link_header = response.headers['Link']
     if raw_link_header is None:
         logging.debug('no Link header, nothing to paginate through.')
         pagination = Pagination(None, None, None, None)
