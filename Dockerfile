@@ -12,6 +12,7 @@ RUN python3 -m venv /venv \
     && /venv/bin/pip install uwsgi && /venv/bin/pip install --no-deps --compile -r /tmp/requirements.txt
 
 FROM 412335208158.dkr.ecr.us-east-1.amazonaws.com/python:3.11-slim
+LABEL com.sproutsocial.docker.base-image="412335208158.dkr.ecr.us-east-1.amazonaws.com/python:3.11-slim"
 
 ENV r=/botanist
 
