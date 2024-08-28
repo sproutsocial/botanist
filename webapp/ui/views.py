@@ -128,9 +128,9 @@ def prepare_source_line(query_re, srcline, html=True):
 def get_query_re(query, case_sensitive=True):
     try:
         if case_sensitive:
-            return re.compile(r'(' + query + r')')
+            return re.compile(r'(' + re.escape(query) + r')')
         else:
-            return re.compile(r'(' + query + r')', flags=re.IGNORECASE)
+            return re.compile(r'(' + re.escape(query) + r')', flags=re.IGNORECASE)
     except Exception as e:
         raise RegexError(e)
 
