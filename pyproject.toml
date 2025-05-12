@@ -1,10 +1,14 @@
-[tool.poetry]
+[project]
 name = "botanist"
-version = "1.0.0"
 description = "Fast web and command-line code search tool for companies and teams who use github and/or bitbucket."
-authors = ["Your Name <you@example.com>"]
-license = "MIT"
+license = { text = "MIT" }
 readme = "README.md"
+authors = [
+    { name = "Your Name", email = "<you@example.com>" }
+]
+
+[tool.poetry]
+version = "1.0.0"
 
 [tool.poetry.dependencies]
 python = "^3.11"

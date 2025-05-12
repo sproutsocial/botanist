@@ -1,4 +1,3 @@
-ARBITRARY UPDATE FOR A BUILD
 # botanist
 a web and command-line code search tool for teams.
 
