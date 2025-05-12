@@ -6,7 +6,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 RUN pip install poetry
 COPY pyproject.toml poetry.lock /tmp/
-RUN poetry export -C /tmp --output=/tmp/requirements.txt
+RUN poetry export -f /tmp --output=/tmp/requirements.txt
 
 RUN python3 -m venv /venv \
     && /venv/bin/pip install uwsgi && /venv/bin/pip install --no-deps --compile -r /tmp/requirements.txt
