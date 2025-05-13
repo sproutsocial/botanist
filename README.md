@@ -11,9 +11,9 @@ Updates to this repo will trigger a [jenkins job](https://build.int.sproutsocial
 
 ### Deploys
 
-The image launched on the codesearcher instance is managed by [infra_chef](https://github.com/sproutsocial/infra_chef/tree/main).
+The image launched on the codesearcher instance is managed by [chef_enterprise](https://github.com/sproutsocial/chef_enterprise/tree/main).
 
-Once a new image is uploaded, to deploy it requires an infra_chef PR to update the [botanist_version attribute](https://github.com/sproutsocial/infra_chef/blob/main/cookbooks/sprout_codesearcher/attributes/default.rb#L11)
+Once a new image is uploaded, to deploy it requires a `chef_enterprise` PR to update the [botanist_version attribute](https://github.com/sproutsocial/chef_enterprise/blob/main/cookbooks/sprout_codesearcher/attributes/default.rb#L8)
 
 (Don't forget to also bump the cookbook version in `metadata.rb` and update `CHANGELOG`)
 

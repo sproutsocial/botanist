@@ -5,6 +5,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 RUN pip install poetry
+RUN poetry self add poetry-plugin-export
 COPY pyproject.toml poetry.lock /tmp/
 RUN poetry export -C /tmp --output=/tmp/requirements.txt
 
