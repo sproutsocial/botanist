@@ -1,6 +1,6 @@
 import json
 import logging
-import pipes
+import shlex
 import re
 import time
 
@@ -60,7 +60,7 @@ def search(request):
     try:
         results, count = parse_search_results(output, query, case_sensitive)
     except RegexError as e:
-        error = e.message
+        error = str(e)
     ts = "%.2f seconds" % (time.time() - s)
     log.info('search time=%s', ts)
 
@@ -83,7 +83,7 @@ def search_json(request):
     try:
         results, count = parse_search_results(output, query, case_sensitive, html=False)
     except RegexError as e:
-        error = e.message
+        error = str(e)
 
     return render_json({'results': results, 'count': count, 'error': error})
 
@@ -95,7 +95,7 @@ def render_json(data, status_code=200):
 def do_search(query: str, case_sensitive=True) -> str:
     # this is extremely important security code here, this
     # prevents shell code injection
-    safe_query = pipes.quote(query)
+    safe_query = shlex.quote(query)
 
     case_arg = '' if case_sensitive else '-i'
     executable = path.join(BIN_PATH, 'csearch')

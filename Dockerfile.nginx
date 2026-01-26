@@ -8,7 +8,7 @@ RUN poetry run python manage.py collectstatic --noinput
 
 # multistage builds are awesomeeee
 # https://docs.docker.com/engine/userguide/eng-image/multistage-build/#use-multi-stage-builds
-FROM nginx:1.25.1
+FROM nginx:1.28
 
 # from https://raw.githubusercontent.com/nginx/nginx/master/conf/uwsgi_params
 ADD uwsgi_params /etc/nginx/uwsgi_params
