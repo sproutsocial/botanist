@@ -1,17 +1,77 @@
-/* Remove the stupid outer glow in Webkit */
-input:focus
-{
-	outline:0;
+/* CSS Custom Properties */
+:root {
+    --font-mono: 'SF Mono', 'Consolas', 'Monaco', 'Courier New', monospace;
+
+    /* Colors */
+    --bg: #fff;
+    --bg-input: #fff;
+    --bg-target: #eee;
+    --bg-highlight: #c0e8a0;
+    --bg-repo-header: #7ac143;
+
+    --text: #000;
+    --text-muted: gray;
+    --text-code: #666;
+    --text-lineno: #bbb;
+    --text-search-box: #55862f;
+    --text-repo-header: #fff;
+
+    --border: #7ac143;
+    --border-input: initial;
+
+    --link-nav: #52802c;
+    --link-nav-hover: gray;
+
+    --btn-border: #7ac143;
+    --btn-text: #7ac143;
+    --btn-hover-bg: #7ac143;
+    --btn-hover-text: #fff;
 }
 
+body.dark-mode {
+    color-scheme: dark;
+    --bg: #1a1a1a;
+    --bg-input: #2d2d2d;
+    --bg-target: #2d2d2d;
+    --bg-highlight: #3d5c2a;
+    --bg-repo-header: #3d5c2a;
+
+    --text: #e0e0e0;
+    --text-muted: #888;
+    --text-code: #b0b0b0;
+    --text-lineno: #555;
+    --text-search-box: #7ac143;
+    --text-repo-header: #fff;
+
+    --border: #3d5c2a;
+    --border-input: #444;
+
+    --link-nav: #7ac143;
+    --link-nav-hover: #9d9;
+
+    --btn-border: #7ac143;
+    --btn-text: #7ac143;
+    --btn-hover-bg: #7ac143;
+    --btn-hover-text: #1a1a1a;
+}
+
+/* Base */
 * {
     margin: 0;
     padding: 0;
 }
 
-/* inherit link style from wherever we are, so linkified source
-code with syntax highlighting doesn't turn into ugly
-*/
+html, body, .container {
+    height: 100%;
+    background-color: var(--bg);
+    color: var(--text);
+}
+
+input:focus {
+    outline: 0;
+}
+
+/* Links */
 a.source-code-link {
     color: inherit;
     font: inherit;
@@ -19,78 +79,27 @@ a.source-code-link {
 }
 
 a.source-code-link:hover {
-    background-color: #c0e8a0;
+    background-color: var(--bg-highlight);
 }
 
 a.reponame-nav {
-    color: #52802c;
+    color: var(--link-nav);
     font-size: 10pt;
 }
 
 a.reponame-nav:hover {
-    color: gray;
+    color: var(--link-nav-hover);
 }
 
-a.reponame-nav:visited{
-    color: #52802c;
+a.reponame-nav:visited {
+    color: var(--link-nav);
 }
 
-html, body, .container {
-    height: 100%;
-}
-
-#search-main {
-    display: block;
-    text-align: center;
-    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
-    font-size: 10pt;
-}
-
-#search-box {
-    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
-    font-size: 10pt;
-    color: #55862f;
-}
-
-#search-box-display {
-    padding: 1px;
-}
-
-#search-help {
-    display: block;
-    text-align: center;
-    font-size: 7pt;
-    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
-    color: black;
-    padding: 5px;
-}
-
+/* Layout */
 .container:before {
     content: '';
     height: 100%;
     float: left;
-}
-
-.header {
-    border-left: 2px #7ac143 solid;
-    margin-left: 0;
-    padding: 5px;
-    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
-    font-size: 10pt;
-}
-
-.content {
-    position: relative;
-    z-index: 1;
-    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
-    font-size: 10pt;
-    border-top: 2px #7ac143 solid;
-}
-
-.content:after {
-    content: '';
-    clear: both;
-    display: block;
 }
 
 .wrapper {
@@ -103,10 +112,64 @@ html, body, .container {
     height: 100%;
 }
 
-#search-form-container {
-    margin-top:5px;
+/* Search page - main */
+#search-main {
+    display: block;
+    text-align: center;
+    font-family: var(--font-mono);
+    font-size: 10pt;
 }
 
+#search-box {
+    font-family: var(--font-mono);
+    font-size: 10pt;
+    color: var(--text-search-box);
+    background-color: var(--bg-input);
+    border: 1px solid var(--border-input);
+}
+
+#search-box-display {
+    padding: 1px;
+}
+
+#search-help {
+    display: block;
+    text-align: center;
+    font-size: 7pt;
+    font-family: var(--font-mono);
+    color: var(--text-muted);
+    padding: 5px;
+}
+
+#search-form-container {
+    margin-top: 5px;
+}
+
+/* Header */
+.header {
+    border-left: 2px solid var(--border);
+    margin-left: 0;
+    padding: 5px;
+    font-family: var(--font-mono);
+    font-size: 10pt;
+}
+
+/* Content */
+.content {
+    position: relative;
+    z-index: 1;
+    font-family: var(--font-mono);
+    font-size: 10pt;
+    border-top: 2px solid var(--border);
+}
+
+.content:after {
+    content: '';
+    clear: both;
+    display: block;
+}
+
+/* Search results */
 .search-results {
     padding: 0;
     overflow: auto;
@@ -115,24 +178,24 @@ html, body, .container {
 #search-results-summary {
     margin-top: 8px;
     font-size: 8pt;
-    color: gray;
+    color: var(--text-muted);
 }
 
 .highlighted-search-query {
-    background-color: #c0e8a0;
+    background-color: var(--bg-highlight);
     font-weight: bold;
 }
 
 .reponame {
     font-weight: bold;
-    background-color: #7ac143;
-    color: white;
+    background-color: var(--bg-repo-header);
+    color: var(--text-repo-header);
     padding: 4px;
 }
 
 .left-nav {
-    border-left: 2px #7ac143 solid;
-    border-right: 2px #7ac143 solid;
+    border-left: 2px solid var(--border);
+    border-right: 2px solid var(--border);
     margin: 0;
     float: left;
     padding: 5px;
@@ -141,19 +204,44 @@ html, body, .container {
 
 .filename {
     padding: 2px 2px 2px 10px;
-    /*margin: 3px;*/
 }
 
 .filename-text {
-    color: gray;
+    color: var(--text-muted);
     font-size: 7pt;
     font-weight: bold;
 }
 
 code {
-    /*font-family: 'Consolas', 'Monaco', 'Courier New', monospace;*/
     font-size: 9pt;
-    color: #666666;
+    color: var(--text-code);
+}
+
+.lineno {
+    color: var(--text-lineno);
+    font-size: 8pt;
+    margin-right: 8px;
+    user-select: none;
+}
+
+:target {
+    background: var(--bg-target);
+}
+
+/* Misc */
+img.vcs_loc {
+    width: 13px;
+    height: 13px;
+}
+
+.vcs_loc_text {
+    font-size: 7pt;
+}
+
+.error {
+    margin-top: 8px;
+    font-size: 8pt;
+    color: red;
 }
 
 .rounded-corners {
@@ -163,21 +251,21 @@ code {
     border-radius: 1px;
 }
 
-:target {
-   background: #eeeeee;
-}
-
-img.vcs_loc {
-    width: 13px;
-    height: 13px;
-}
-
-.vcs_loc_text {
-    font-size:7pt;
-}
-
-.error {
-    margin-top: 8px;
+/* Theme toggle button */
+#theme-toggle {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    background: none;
+    border: 1px solid var(--btn-border);
+    color: var(--btn-text);
+    font-family: var(--font-mono);
     font-size: 8pt;
-    color: red;
+    padding: 4px 8px;
+    cursor: pointer;
+}
+
+#theme-toggle:hover {
+    background-color: var(--btn-hover-bg);
+    color: var(--btn-hover-text);
 }

@@ -3,6 +3,22 @@
 <link rel="shortcut icon" type="image/x-icon" href="{% static 'favicon.ico' %}" />
 <!-- other browsers -->
 <link rel="icon" type="image/x-icon" href="{% static 'favicon.ico' %}" />
+<button id="theme-toggle" onclick="toggleTheme()">dark</button>
+<script>
+function toggleTheme() {
+    const isDark = document.body.classList.toggle('dark-mode');
+    localStorage.setItem('theme', isDark ? 'dark' : 'light');
+    document.getElementById('theme-toggle').textContent = isDark ? 'light' : 'dark';
+}
+(function() {
+    const saved = localStorage.getItem('theme');
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    if (saved === 'dark' || (!saved && prefersDark)) {
+        document.body.classList.add('dark-mode');
+        document.getElementById('theme-toggle').textContent = 'light';
+    }
+})();
+</script>
 {#<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/styles/default.min.css">#}
 <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/styles/mono-blue.min.css">
 {#<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/styles/ascetic.min.css">#}
@@ -52,7 +68,7 @@
                                     <pre><code><a href="{{ r.deeplink }}"
                                                   target="_blank"
                                                   title="{{ r.lineno }}"
-                                                  class="source-code-link">{{ r.lineno }}: {{ r.srcline|safe }}</a></code></pre>
+                                                  class="source-code-link"><span class="lineno">{{ r.lineno }}</span> {{ r.srcline|safe }}</a></code></pre>
                                 {% endfor %}
                                 <br>
                             </div>
