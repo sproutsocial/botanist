@@ -46,5 +46,6 @@ VOLUME ${r}/repos
 RUN groupadd -r botanist -g 9009 && useradd -u 9009 -g 9009 --no-log-init -r -g botanist botanist
 RUN chown -R botanist:botanist ${r}
 USER botanist
+WORKDIR /botanist
 
 CMD /venv/bin/uwsgi --socket :9090 --chdir /code --virtualenv /venv --wsgi-file /code/codesearch/wsgi.py --master --processes 4 --threads 2 --buffer-size 65535 --enable-threads --py-call-uwsgi-fork-hooks

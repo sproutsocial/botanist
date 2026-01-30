@@ -147,7 +147,7 @@ def repocsv(string):
         repos = [r.strip() for r in string.split(',')]
         return set(repos)
     except Exception as exc:
-        raise argparse.ArgumentTypeError(exc.message)
+        raise argparse.ArgumentTypeError(str(exc))
 
 
 if __name__ == '__main__':
